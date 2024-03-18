@@ -1,0 +1,10 @@
+#services:
+#  hiking:
+#    image:
+#    profiles:
+#  destination:
+#    image:
+#  review:
+#    image:
+#  booking:
+#    image:

@@ -68,7 +68,7 @@ RUN adduser \
 USER appuser
 
 # Copy the executable from the "package" stage.
-COPY --from=package build/app .
+COPY --from=deps build/app .
 
 EXPOSE 2024
 

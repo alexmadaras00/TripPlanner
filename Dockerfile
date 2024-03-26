@@ -16,6 +16,7 @@ WORKDIR /build
 # Copy the gradlew wrapper with executable permissions.
 COPY --chmod=0755 gradlew gradlew
 COPY gradle/ gradle/
+COPY ./settings.gradle settings.gradle
 
 # Download dependencies as a separate step to take advantage of Docker's caching.
 # Leverage a cache mount to /root/.m2 so that subsequent builds don't have to

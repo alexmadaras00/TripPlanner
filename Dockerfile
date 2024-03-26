@@ -37,11 +37,11 @@ FROM deps as package
 WORKDIR /build
 
 COPY ./src src/
+COPY ./build/libs/TripPlanner-0.0.1-SNAPSHOT.jar /build/libs/TripPlanner-0.0.1-SNAPSHOT.jar
 CMD ["./gradlew", "bootJar", "--stacktrace"]
 CMD ["mv", "./build/libs/*", "./app.jar"]
-RUN ["echo", "$(ls)"]
-ENTRYPOINT ["java","-jar","./build/libs/TripPlanner-0.0.1-SNAPSHOT.jar"]
-CMD ["java", "-jar", "./app.jar"]
+ENTRYPOINT ["java","-jar","/build/libs/TripPlanner-0.0.1-SNAPSHOT.jar"]
+CMD ["java", "-jar", ".src/app.jar"]
 
 #RUN --mount=type=bind,source=build.gradle,target=build.gradle \
 #    --mount=type=cache,target=/root/.m2 \

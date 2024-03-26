@@ -1,4 +1,5 @@
 package booking.payment;
 
-public class PaymentService {
+public interface PaymentService {
+
 }

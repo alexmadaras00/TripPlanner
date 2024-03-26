@@ -1,4 +1,4 @@
 package booking.recommender;
 
-public class RecommenderService {
+public interface RecommenderService {
 }

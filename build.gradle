@@ -11,6 +11,9 @@ version = '0.0.1-SNAPSHOT'
 java {
     sourceCompatibility = '17'
 }
+bootJar {
+    mainClass = 'org.example.tripplanner.TripPlannerApplication'
+}
 
 configurations {
     compileOnly {

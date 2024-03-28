@@ -1,0 +1,21 @@
+# STAGE 1 - from Dockerfile.dependencies file
+FROM eclipse-temurin as downloadDependencies
+# STAGE 1 - Download dependencies
+WORKDIR /app
+COPY gradlew .
+COPY gradle gradle
+COPY build.gradle .
+COPY settings.gradle .
+
+RUN ./gradlew dependencies
+# STAGE 2 - Build
+
+FROM dependencies as build
+COPY src src
+RUN ./gradlew build
+
+#STAGE 3 - Add a volume
+FROM build as addVolume
+VOLUME /shared-volume
+RUN mkdir /shared-data
+RUN cp gradlew /shared-data

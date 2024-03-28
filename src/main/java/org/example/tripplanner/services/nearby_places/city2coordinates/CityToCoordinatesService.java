@@ -1,4 +1,4 @@
-package nearby_places.city2coordinates;
+package org.example.tripplanner.services.nearby_places.city2coordinates;
 
 import java.util.ArrayList;
 

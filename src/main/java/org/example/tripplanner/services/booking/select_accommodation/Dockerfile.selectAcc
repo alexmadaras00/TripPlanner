@@ -9,7 +9,7 @@ COPY ../../../../src src
 RUN ./gradlew dependencies
 
 FROM deps as build
-COPY . .
+COPY ../book_and_pay .
 RUN ./gradlew build
 
 FROM build as deploy
@@ -17,4 +17,4 @@ RUN ./gradlew bootJar
 RUN ls build/libs/
 RUN mv $(ls build/libs/*.jar | head -n 1) app.jar
 
-ENTRYPOINT ["java","-jar","./build/libs/payment-service.jar"]
+ENTRYPOINT ["java","-jar","./build/libs/select-accommodation-service.jar"]

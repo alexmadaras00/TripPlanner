@@ -1,4 +1,4 @@
-FROM eclipse-temurin as downloadDependencies
+FROM eclipse-temurin as deps
 # STAGE 1 - Download dependencies
 WORKDIR /app
 COPY gradlew .

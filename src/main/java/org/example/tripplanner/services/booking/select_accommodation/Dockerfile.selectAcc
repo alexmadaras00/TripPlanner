@@ -9,12 +9,12 @@ COPY ../../../../src src
 RUN ./gradlew dependencies
 
 FROM deps as build
-COPY ../book_and_pay .
-RUN ./gradlew build
+RUN ./gradlew build -Dorg.gradle.java.home=/opt/java/openjdk -Duser.home=/tmp/gradle_home
+
 
 FROM build as deploy
 RUN ./gradlew bootJar
 RUN ls build/libs/
 RUN mv $(ls build/libs/*.jar | head -n 1) app.jar
 
-ENTRYPOINT ["java","-jar","./build/libs/select-accommodation-service.jar"]
+ENTRYPOINT ["java","-jar","app.jar"]

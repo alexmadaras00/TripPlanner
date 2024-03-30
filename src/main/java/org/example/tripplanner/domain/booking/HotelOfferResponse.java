@@ -1,4 +1,4 @@
-package org.example.tripplanner.data.booking;
+package org.example.tripplanner.domain.booking;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

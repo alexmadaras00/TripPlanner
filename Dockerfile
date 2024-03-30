@@ -1,5 +1,5 @@
 
-FROM eclipse-temurin as downloadDependencies
+FROM eclipse-temurin as deps
 # STAGE 1 - Download dependencies
 WORKDIR /app
 COPY gradlew .
@@ -10,9 +10,9 @@ COPY settings.gradle .
 RUN ./gradlew dependencies
 
 # STAGE 2 - Build
-FROM downloadDependencies as build
+FROM deps as build
 COPY src src
-RUN .\gradlew build
+RUN ./gradlew build
 
 #STAGE 3 - Deploy
 FROM build as deploy

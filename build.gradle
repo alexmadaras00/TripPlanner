@@ -42,8 +42,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    compileOnly 'org.projectlombok:lombok:1.18.22'
-    annotationProcessor 'org.projectlombok:lombok:1.18.22'
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+    implementation 'org.json:json:20231013'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
 }
 
 tasks.named('test') {

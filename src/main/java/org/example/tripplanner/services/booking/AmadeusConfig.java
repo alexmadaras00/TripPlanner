@@ -1,10 +1,11 @@
 package org.example.tripplanner.services.booking;
 
 import jakarta.annotation.PostConstruct;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.configurationprocessor.json.JSONException;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
+
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -22,7 +23,7 @@ public class AmadeusConfig {
 
     @Value("${amadeus.clientSecret}")
     private String secretKey;
-
+    @Autowired
     RestTemplateBuilder restTemplateBuilder;
     RestTemplate restTemplate;
 

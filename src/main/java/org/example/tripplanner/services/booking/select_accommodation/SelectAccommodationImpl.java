@@ -1,17 +1,13 @@
 package org.example.tripplanner.services.booking.select_accommodation;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
-import org.example.tripplanner.data.booking.Hotel;
-import org.example.tripplanner.data.booking.HotelOfferResponse;
+import org.example.tripplanner.domain.booking.HotelOfferResponse;
 import org.example.tripplanner.services.booking.AmadeusConfig;
+import org.example.tripplanner.utils.Print;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.configurationprocessor.json.JSONArray;
-import org.springframework.boot.configurationprocessor.json.JSONException;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
+import org.json.JSONObject;
+import org.json.JSONException;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -32,15 +28,17 @@ public class SelectAccommodationImpl extends AmadeusConfig implements SelectAcco
     @Value("${amadeus.clientSecret}")
     private String secretKey;
 
+    @Autowired
     RestTemplateBuilder restTemplateBuilder;
     RestTemplate restTemplate;
+    Print print = new Print();
 
     @PostConstruct
     public void init() {
         restTemplate = restTemplateBuilder.build();
     }
 
-    protected String authenticate() throws JSONException {
+    protected String authenticate() {
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
@@ -66,10 +64,11 @@ public class SelectAccommodationImpl extends AmadeusConfig implements SelectAcco
     }
 
     @Override
-    public HotelOfferResponse receiveOffer(ArrayList<String> hotelID) throws JSONException {
+    public HotelOfferResponse receiveOffer(String hotelID) throws JSONException {
         HttpEntity<String> entity = buildRestTemplate();
-        String result = String.join(", ", hotelID);
-        ResponseEntity<HotelOfferResponse> response = restTemplate.exchange("https://test.api.amadeus.com/v3/shopping/hotel-offers?hotelIds="+result+"&adults=1&checkInDate=2024-11-20&checkOutDate=2024-11-24&roomQuantity=1&paymentPolicy=NONE&bestRateOnly=true", HttpMethod.GET, entity, HotelOfferResponse.class);
+
+        print.print(this.getClass(),"HotelIDS: "+ hotelID);
+        ResponseEntity<HotelOfferResponse> response = restTemplate.exchange("https://test.api.amadeus.com/v3/shopping/hotel-offers?hotelIds=[" + hotelID + "]", HttpMethod.GET, entity, HotelOfferResponse.class);
         return response.getBody();
     }
 }

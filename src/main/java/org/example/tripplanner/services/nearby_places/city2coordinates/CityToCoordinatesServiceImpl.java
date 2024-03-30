@@ -9,7 +9,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.ArrayList;
 
 @Service
-public class CityToCoordinatesServiceImpl implements CityToCoordinatesService{
+public class CityToCoordinatesServiceImpl implements CityToCoordinatesService {
     @Value("${openweathermap.host}")
     private String host;
     @Value("${openweathermap.key}")

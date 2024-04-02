@@ -4,10 +4,10 @@ import jakarta.annotation.PostConstruct;
 import org.example.tripplanner.domain.booking.HotelOfferResponse;
 import org.example.tripplanner.services.booking.AmadeusConfig;
 import org.example.tripplanner.utils.Print;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.json.JSONObject;
-import org.json.JSONException;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -18,7 +18,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
+import java.util.Objects;
 
 @Service
 public class SelectAccommodationImpl extends AmadeusConfig implements SelectAccommodation {
@@ -68,7 +68,9 @@ public class SelectAccommodationImpl extends AmadeusConfig implements SelectAcco
         HttpEntity<String> entity = buildRestTemplate();
 
         print.print(this.getClass(),"HotelIDS: "+ hotelID);
-        ResponseEntity<HotelOfferResponse> response = restTemplate.exchange("https://test.api.amadeus.com/v3/shopping/hotel-offers?hotelIds=[" + hotelID + "]", HttpMethod.GET, entity, HotelOfferResponse.class);
+
+        ResponseEntity<HotelOfferResponse> response = restTemplate.exchange("https://test.api.amadeus.com/v3/shopping/hotel-offers?hotelIds="+hotelID, HttpMethod.GET, entity, HotelOfferResponse.class);
+        print.print(this.getClass(),"Response: "+ Objects.requireNonNull(response.getBody()).getData().get(0).getHotel().getName());
         return response.getBody();
     }
 }

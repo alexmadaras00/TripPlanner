@@ -22,8 +22,8 @@
     </style>
 </head>
 <body>
-<header th:text="${hotelOfferResponse.hotel.name}"></header>
-<div th:each="offer : ${hotelOfferResponse.offers}">
+<header><strong th:text="${hotelOfferResponse.data.get(0).hotel.name}"></strong></header>
+<div th:each="offer : ${hotelOfferResponse.data.get(0).offers}">
     <h2 th:text="${offer.id}"></h2>
     <table>
         <tr>

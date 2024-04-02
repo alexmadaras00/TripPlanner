@@ -49,5 +49,11 @@ public class TripPlannerController {
         model.addAttribute("hotelOfferResponse", selectAccommodation.receiveOffer(hotelId));
         return "show-property";
     }
+
+    @PostMapping("/error")
+    public String showError(Exception e, Model model) {
+        model.addAttribute("exception", e);
+        return "error";
+    }
 }
 

@@ -44,6 +44,7 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     compileOnly 'org.projectlombok:lombok:1.18.30'
     implementation 'org.json:json:20231013'
+    implementation 'com.rabbitmq:amqp-client:5.20.0'
     annotationProcessor 'org.projectlombok:lombok:1.18.30'
 }
 

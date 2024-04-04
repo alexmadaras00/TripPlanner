@@ -1,23 +1,25 @@
-package org.example.tripplanner.services.hiking.city2coordinates;
+package org.example.tripplanner.services.nearby_places;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 
 @Service
-public class CityToCoordinatesServiceImpl implements CityToCoordinatesService {
-    @Value("${openweathermap.host}")
+public class FindPlacesImpl implements FindPlaces {
+    @Value("${googleplaces.host}")
     private String host;
-    @Value("${openweathermap.key}")
+    @Value("${googleplaces.key}")
     private String key;
     @Autowired
     private RestTemplateBuilder restTemplateBuilder;
-    public ArrayList getConvertedCityIntoCoordinatesWithSpringRest(String city) {
-        String url = host + "/geo/1.0/direct?q=" + city + "&limit=1&appid=" + key;
+    @Override
+    public ArrayList getNearbyPlaces(double latitude, double longitude) {
+        String url = host + "/nearbysearch/json?location=" + latitude + "," + longitude +
+                "&radius=5000&key=" + key;
         RestTemplate restTemplate = restTemplateBuilder.build();
         return restTemplate.getForObject(url, ArrayList.class);
     }

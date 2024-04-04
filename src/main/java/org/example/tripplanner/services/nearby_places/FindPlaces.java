@@ -1,4 +1,4 @@
-package org.example.tripplanner.services.nearby_places.find_nearby_places;
+package org.example.tripplanner.services.nearby_places;
 
 import java.util.ArrayList;
 

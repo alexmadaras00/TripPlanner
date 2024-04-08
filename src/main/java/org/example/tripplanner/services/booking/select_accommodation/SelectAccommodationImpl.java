@@ -60,7 +60,7 @@ public class SelectAccommodationImpl extends AmadeusConfig implements SelectAcco
         HttpHeaders headers = new HttpHeaders();
         String accessToken = authenticate();
         headers.add("Authorization", "Bearer " + accessToken);
-        return new HttpEntity<>("parameters", headers);
+        return new HttpEntity<>( headers);
     }
 
     @Override

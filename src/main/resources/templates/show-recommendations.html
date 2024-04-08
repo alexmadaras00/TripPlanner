@@ -28,6 +28,8 @@
 </head>
 <body>
 <header>
+    <b>Coordinates: </b>
+    <h2 th:text="${coordinates}"></h2>
     <b>List of Hotels:</b>
 </header>
 <div th:each="hotel : ${recommendationList}">
@@ -45,5 +47,6 @@
     </form>
     <hr>
 </div>
+
 </body>
 </html>

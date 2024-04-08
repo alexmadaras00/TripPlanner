@@ -46,6 +46,12 @@ dependencies {
     implementation 'org.json:json:20231013'
     implementation 'com.rabbitmq:amqp-client:5.20.0'
     annotationProcessor 'org.projectlombok:lombok:1.18.30'
+    implementation 'com.google.appengine:appengine-api-1.0-sdk:2.0.26'
+    implementation 'com.google.maps:google-maps-services:2.2.0'
+    implementation 'org.slf4j:slf4j-simple:1.7.25'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+
 }
 
 tasks.named('test') {

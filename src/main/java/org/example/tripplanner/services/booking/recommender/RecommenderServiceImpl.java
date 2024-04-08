@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
+
 import org.example.tripplanner.data.booking.Hotel;
 import org.example.tripplanner.services.booking.AmadeusConfig;
 import org.example.tripplanner.utils.Print;
@@ -12,16 +13,17 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @Service
 public class RecommenderServiceImpl extends AmadeusConfig implements RecommenderService {
@@ -42,7 +44,7 @@ public class RecommenderServiceImpl extends AmadeusConfig implements Recommender
         restTemplate = restTemplateBuilder.build();
     }
 
-    protected String authenticate(){
+    protected String authenticate() {
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
@@ -64,13 +66,11 @@ public class RecommenderServiceImpl extends AmadeusConfig implements Recommender
         HttpHeaders headers = new HttpHeaders();
         String accessToken = authenticate();
         headers.add("Authorization", "Bearer " + accessToken);
-        return new HttpEntity<>("parameters", headers);
+        return new HttpEntity<>(headers);
     }
-
-
     public ArrayList<Hotel> searchHotelsByCityCode(String cityCode) {
         HttpEntity<String> entity = buildRestTemplate();
-        print.print(this.getClass(),"Code: "+ cityCode);
+        print.print(this.getClass(), "Code: " + cityCode);
         ResponseEntity<String> response = restTemplate.exchange("https://test.api.amadeus.com/v1/reference-data/locations/hotels/by-city?cityCode=" + cityCode, HttpMethod.GET, entity, String.class);
 
         JSONObject jsonObject = new JSONObject(response.getBody());
@@ -89,11 +89,16 @@ public class RecommenderServiceImpl extends AmadeusConfig implements Recommender
 
     @Override
     public String getCityCode(String city) {
-        HttpEntity<String> entity = buildRestTemplate();
-        ResponseEntity<String> response = restTemplate.exchange("https://test.api.amadeus.com/v1/reference-data/locations/cities?keyword=" + city, HttpMethod.GET, entity, String.class);
-
-        JSONObject jsonObject = new JSONObject(response.getBody());
-        String name = jsonObject.getJSONArray("data").getJSONObject(0).getString("iataCode");
-        return name;
+        WebClient webClient = WebClient.create();
+        String accessToken = authenticate();
+        Mono<String> response = webClient.get()
+                .uri("https://test.api.amadeus.com/v1/reference-data/locations/cities?keyword=" + city)
+                .header("Authorization", "Bearer " + accessToken)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .bodyToMono(String.class);
+        String responseBody = response.block();
+        JSONObject jsonObject = new JSONObject(responseBody);
+        return jsonObject.getJSONArray("data").getJSONObject(0).getString("iataCode");
     }
 }

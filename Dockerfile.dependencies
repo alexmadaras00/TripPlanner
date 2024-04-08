@@ -2,7 +2,7 @@ FROM eclipse-temurin as deps
 # STAGE 1 - Download dependencies
 WORKDIR /app
 COPY gradlew .
-COPY gradle gradle
+COPY build/gradle gradle
 COPY build.gradle .
 COPY settings.gradle .
 RUN ./gradlew dependencies

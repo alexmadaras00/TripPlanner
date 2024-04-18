@@ -22,10 +22,7 @@ public class LoginController {
 
     @PostMapping("/login")
     public String loginPost(String username, String password, Model model) {
-//        return userService.findByUsername(username)
-//                .filter(user -> password.equals(user.getPassword()))
-//                .flatMap(user -> "")
-//                .switchIfEmpty(Mono.just("login").doOnNext(s -> model.addAttribute("loginError", true)));
+
         return "";
     }
 

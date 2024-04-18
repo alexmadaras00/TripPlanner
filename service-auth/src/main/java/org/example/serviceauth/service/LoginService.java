@@ -15,9 +15,10 @@ public class LoginService {
         this.userRepository = userRepository;
     }
 
-    public Mono<User> findByUsername(String username) {
+    public User findByUsername(String username) {
         return userRepository.findByUsername(username);
     }
+
 
     // other service methods
 }

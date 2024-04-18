@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head th:object="${hotelOfferResponse}">
+    <meta charset="UTF-8">
+    <title>TripPlanner - Selected Property</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+<div th:each="offer : ${hotelOfferResponse.data}">
+    <header><strong th:text="${offer.hotel.getDupeId()}"></strong></header>
+    <h2><strong>Type: </strong><a th:text="${offer.type}"></a></h2>
+    <div th:each="hotelOffer : ${offer.getOffers()}">
+        <table>
+            <tr>
+                <th>Check In Date</th>
+                <td th:text="${hotelOffer.checkInDate}"></td>
+            </tr>
+            <tr>
+                <th>Check Out Date</th>
+                <td th:text="${hotelOffer.checkOutDate}"></td>
+            </tr>
+            <tr>
+                <th>Rate Code</th>
+                <td th:text="${hotelOffer.rateCode}"></td>
+            </tr>
+            <tr>
+                <th>Room Type</th>
+                <td th:text="${hotelOffer.room.type}"></td>
+            </tr>
+            <tr>
+                <th>Price</th>
+                <td th:text="${hotelOffer.price.total+' '+hotelOffer.price.getCurrency()}"></td>
+            </tr>
+            <tr>
+                <th>Payment Type</th>
+                <td th:text="${hotelOffer.policies.paymentType}"></td>
+            </tr>
+        </table>
+        <form style="margin-top: 4vh" th:action="@{'/bookProperty/' + ${hotelOffer.getId()}}" method="post">
+        <input type="hidden" name="hotelId" th:value="${hotelOffer.getId()}">
+        <button type="submit">Book it!</button>
+        </form>
+    </div>
+
+</div>
+</body>
+</html>

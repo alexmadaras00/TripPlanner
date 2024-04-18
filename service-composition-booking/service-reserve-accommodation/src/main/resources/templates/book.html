@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>Booking</title>
+</head>
+<body>
+<form action="/confirmation" method="post" th:object="${bookingForm}">
+    <div th:each="guest, stat : *{data.guests}">
+        <h3>Guest Details</h3>
+        <a>Info</a>
+        <label>
+            <input type="text"  th:field="*{data.guests[__${stat.index}__].name.title}" placeholder="Title" required>
+            <input type="text"  th:field="*{data.guests[__${stat.index}__].name.firstName}" placeholder="First Name" required>
+            <input type="text"  th:field="*{data.guests[__${stat.index}__].name.lastName}" placeholder="Last Name" required>
+        </label>
+        <label>
+            <a>Contact</a>
+            <input type="text"  th:field="*{data.guests[__${stat.index}__].contact.phone}" placeholder="Phone" required>
+            <input type="text"  th:field="*{data.guests[__${stat.index}__].contact.email}" placeholder="E-mail" required>
+        </label>
+    </div>
+</form>
+
+
+<script>
+    $('#paymentMethod').change(function () {
+        var method = $(this).val();
+        $('#paymentDetails').empty();
+        if (method === 'creditCard') {
+            $('#paymentDetails').append(`
+                        <label>
+                            <input type="text" th:field="*{data.payments[0].card.vendorCode}" placeholder="Card Vendor Code" required>
+                        </label>
+                        <!-- Add more fields as needed -->
+                    `);
+        }
+        // Add more conditions as needed for other payment methods
+    });
+    })
+    ;
+</script>
+</body>
+</html>

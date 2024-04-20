@@ -5,7 +5,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import data.Hotel;
 import jakarta.annotation.PostConstruct;
-
 import org.example.bookingservicecomposition.AmadeusConfig;
 import org.json.JSONArray;
 import org.json.JSONException;

@@ -31,6 +31,7 @@ dependencies {
 	implementation 'org.springframework.modulith:spring-modulith-starter-core'
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf:3.2.4'
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -47,9 +48,4 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
-generateJava {
-	schemaPaths = ["${projectDir}/src/main/resources/graphql-client"]
-	packageName = 'org.example.finddestinationservice.codegen'
-	generateClient = true
-}
 

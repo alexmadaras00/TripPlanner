@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TripPlanner</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Form</title>
+    <style>
+        .form-container {
+            display: block; /* Initially visible */
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+
+        .hidden {
+            display: none; /* Hidden after form submission */
+        }
+    </style>
+</head>
+<body>
+<div class="form-container" th:class="${destinations == null or destinations.isEmpty()} ? '' : 'hidden'">
+    <h2>Plan Your Trip</h2>
+    <form th:action="@{/recommendation-list}" method="post" th:object="${tripForm}">
+        <label for="homeLocation">Home Location:</label>
+        <input type="text" id="homeLocation" name="homeLocation" th:field="*{homeLocation}" />
+
+        <label for="startDate">Start Date:</label>
+        <input type="date" id="startDate" name="startDate" th:field="*{startDate}" />
+
+        <label for="endDate">End Date:</label>
+        <input type="date" id="endDate" name="endDate" th:field="*{endDate}" />
+
+        <label for="numberOfTravellers">Number of Travellers:</label>
+        <input type="number" id="numberOfTravellers" name="numberOfTravellers" th:field="*{numberOfTravellers}" />
+        <label for="groupType">Group Type:</label>
+        <select id="groupType" name="groupType" th:field="*{groupType}">
+            <option value="FAMILY">Family</option>
+            <option value="FRIENDS">Friends</option>
+            <option value="SCHOOL">School</option>
+            <option value="COWORKERS">Coworkers</option>
+            <option value="COUPLE">Couple</option>
+        </select>
+
+        <label for="budget">Budget:</label>
+        <select id="budget" name="budget" th:field="*{budget}">
+            <option value="LOW">Low</option>
+            <option value="MEDIUM">Medium</option>
+            <option value="HIGH">High</option>
+        </select>
+
+        <label for="motivation">Motivation:</label>
+        <select id="motivation" name="motivation" th:field="*{motivation}">
+            <option value="FUN">Fun</option>
+            <option value="REMOTE_WORK">Remote Work</option>
+            <option value="EXPLORE">Explore</option>
+            <option value="HIKING">Hiking</option>
+            <option value="BEACH">Beach</option>
+            <option value="NOMAD">Nomad</option>
+            <option value="CAMPING">Camping</option>
+            <option value="FIND_LOVE">Find Love</option>
+            <option value="FIND_FRIENDS">Find Friends</option>
+            <option value="ADVENTURE">Adventure</option>
+            <option value="RELAX">Relax</option>
+            <option value="RESTORE_HOPE">Restore Hope</option>
+            <option value="RECHARGE">Recharge</option>
+        </select>
+
+        <button type="submit">Submit</button>
+    </form>
+</div>
+<div th:if="${destinations != null and not #lists.isEmpty(destinations)}" class="destination-list">
+    <h3>Your Recommendations:</h3>
+    <ul>
+        <li th:each="destination : ${destinations}">
+            <span th:text="${destination.city}"></span>, <span th:text="${destination.country}"></span>
+        </li>
+    </ul>
+</div>
+</body>
+</html>

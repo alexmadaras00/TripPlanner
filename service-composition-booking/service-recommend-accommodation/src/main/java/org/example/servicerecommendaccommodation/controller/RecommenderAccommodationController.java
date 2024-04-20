@@ -26,6 +26,6 @@ public class RecommenderAccommodationController {
         model.addAttribute("cityCode", cityCode);
         model.addAttribute("recommendationList", recommenderService.searchHotelsByCityCode(cityCode));
         request.getSession().setAttribute("city", city);
-        return new ModelAndView("show-recommendations", model.asMap());
+        return new ModelAndView("show_recommendations", model.asMap());
     }
 }

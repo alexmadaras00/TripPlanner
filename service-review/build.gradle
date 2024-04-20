@@ -27,6 +27,9 @@ ext {
 }
 
 dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf:3.2.4'
+    implementation 'redis.clients:jedis:5.0.0'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.springframework.modulith:spring-modulith-starter-core'
@@ -38,11 +41,6 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.projectreactor:reactor-test'
     testImplementation 'org.springframework.modulith:spring-modulith-starter-test'
-
-    implementation 'org.springframework.session:spring-session-data-redis:3.2.2'
-    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-    implementation 'redis.clients:jedis:3.4.0'
-
 
 }
 

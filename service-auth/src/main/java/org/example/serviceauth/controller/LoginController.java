@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.util.Map;
 
@@ -15,32 +16,47 @@ public class LoginController {
     @Autowired
     private LoginService loginService;
 
-    @PostMapping("/signup")
-    public ResponseEntity<String> singUp(@RequestBody User user) {
-        if (!loginService.saveUser(user)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username already exists");
-        }
-        return ResponseEntity.ok("Signed up successfully!");
+    @GetMapping("/login")
+    public String showLoginPage() {
+        return "login";
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody User user) {
+    public ModelAndView login(@RequestParam("username") String username, @RequestParam("password") String password) {
         try {
-            String jwt = loginService.checkUser(user);
-            return ResponseEntity.ok(jwt);
+            String jwt = loginService.checkUser(username, password);
+            ModelAndView modelAndView = new ModelAndView("login");
+            modelAndView.addObject("jwt", jwt);
+            return modelAndView;
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            ModelAndView modelAndView = new ModelAndView("login");
+            modelAndView.addObject("error", e.getMessage());
+            return modelAndView;
         }
+    }
+
+    @GetMapping("/signup")
+    public String showSignUpPage() {
+        return "signup";
+    }
+
+    @PostMapping("/signup")
+    public ModelAndView singUp(@RequestParam("username") String username, @RequestParam("password") String password) {
+        if (!loginService.saveUser(new User(username, password))) {
+            ModelAndView modelAndView = new ModelAndView("signup");
+            modelAndView.addObject("error", "Username already exists");
+            return modelAndView;
+        }
+        return new ModelAndView("login");
     }
 
     @PostMapping("/auth")
     public ResponseEntity<String> auth(@RequestBody Map<String, String> requestBody) {
-        String id = requestBody.get("id");
-        String jwt = requestBody.get("jwt");
-        boolean ans = LoginService.verifyJwtId(id, jwt);
-        if (ans) {
-            return ResponseEntity.ok("Correct");
+        try {
+            String ans = LoginService.getUsernameFromToken(requestBody.get("jwt"));
+            return ResponseEntity.ok(ans);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect");
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect");
     }
 }

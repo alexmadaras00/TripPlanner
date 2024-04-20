@@ -55,16 +55,16 @@ public class LoginService {
         return true;
     }
 
-    public String checkUser(User user) throws Exception {
-        User existingUser = userRepository.findByUsername(user.getUsername()).block();
+    public String checkUser(String username, String password) throws Exception {
+        User existingUser = userRepository.findByUsername(username).block();
         if (existingUser == null) {
             throw new Exception("No Such User");
         }
-        boolean verifiedUser = checkPassword(user.getPassword(), existingUser.getPassword());
+        boolean verifiedUser = checkPassword(password, existingUser.getPassword());
         if (!verifiedUser) {
             throw new Exception("Wrong Password");
         }
-        return existingUser.getId() + "||" + generateToken(existingUser.getId());
+        return generateToken(existingUser.getId());
     }
 
     public static String generateToken(String username) {
@@ -79,11 +79,6 @@ public class LoginService {
                 .setExpiration(expiryDate)
                 .signWith(key)
                 .compact();
-    }
-
-    public static boolean verifyJwtId(String id, String token) {
-        System.out.println(getUsernameFromToken(token));
-        return getUsernameFromToken(token).equals(id);
     }
 
     public static String getUsernameFromToken(String token) {

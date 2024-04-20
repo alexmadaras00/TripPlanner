@@ -14,12 +14,11 @@ public class RoutePlannerController {
     @Autowired
     private RoutePlannerService routePlannerService;
     @GetMapping("/routes")
-    public String showRoutes( ) {
-//        String url = "https://maps.googleapis.com/maps/api/directions/json?origin=";
-//        String currentDestination = "Helsinki";
-//        List<Route> routes = routePlannerService.getRoutes(currentDestination);
-//        model.addAttribute("routes", routes);
-        System.out.println("123x`");
+    public String showRoutes(Model model) {
+        String url = "https://maps.googleapis.com/maps/api/directions/json?origin=";
+        String currentDestination = "Helsinki";
+        List<Route> routes = routePlannerService.getRoutes(currentDestination);
+        model.addAttribute("routes", routes);
         return "routes";
     }
 }

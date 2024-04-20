@@ -1,6 +1,5 @@
 package org.example.servicedestinationrecommender.service;
 
-import com.theokanning.openai.service.OpenAiService;
 import okhttp3.*;
 import org.example.servicedestinationrecommender.data.TripForm;
 import org.example.servicedestinationrecommender.domain.Destination;
@@ -9,15 +8,12 @@ import org.springframework.boot.configurationprocessor.json.JSONArray;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,7 +23,7 @@ public class DestinationRecommenderServiceImpl implements DestinationRecommender
     private String apiKey;
 
     @Override
-    public List<Destination> getRecommendations(TripForm tripForm) throws IOException {
+    public List<Destination> getRecommendations(TripForm tripForm) throws IOException, JSONException {
         String promptText = "You are a seasoned travel advisor assisting a group of enthusiastic travelers. They've provided the following details for their upcoming trip: " +
                 "1. **Home**:" + tripForm.getHomeLocation() + " " +
                 "2. **Travel Period**:" + tripForm.getStartDate() + " to +" + tripForm.getEndDate() + " " +
@@ -40,7 +36,11 @@ public class DestinationRecommenderServiceImpl implements DestinationRecommender
                 "Based on this information, recommend top 5 ideal travel destination that aligns with their preferences and interests. Give them a very short answer. Just list the destinations, no more text.";
         String url = "https://api.edenai.run/v2/text/chat";
         String generatedText = "";
-        OkHttpClient client = new OkHttpClient();
+        OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(30, TimeUnit.SECONDS) // Set a longer timeout
+                .readTimeout(30, TimeUnit.SECONDS)
+                .writeTimeout(30, TimeUnit.SECONDS)
+                .build();
         MediaType mediaType = MediaType.parse("application/json");
         RequestBody body = RequestBody.create("{\"providers\": \"openai\", \"text\": \"" + promptText + "\", \"chatbot_global_action\": \"Act as a seasoned travel advisor assisting a group of enthusiastic travelers.\", \"previous_history\": [], \"temperature\": 0.0, \"max_tokens\": 150, \"fallback_providers\": \"\"}", mediaType);
         Request request = new Request.Builder()
@@ -52,8 +52,17 @@ public class DestinationRecommenderServiceImpl implements DestinationRecommender
                 .build();
 
         Response response = client.newCall(request).execute();
-        generatedText = String.valueOf(response.body());
-
+        if (response.body() != null) {
+            String responseBody = response.body().string();
+            System.out.println("Initial response: " + responseBody);
+            JSONObject genTextObject = new JSONObject(responseBody);
+            JSONArray messages = genTextObject.getJSONObject("openai").getJSONArray("message");
+            System.out.println("Message: " + generatedText);
+            generatedText = messages.getJSONObject(1).getString("message");
+        }
+        else{
+            getErrorPage();
+        }
         return parse(generatedText);
     }
 
@@ -67,5 +76,10 @@ public class DestinationRecommenderServiceImpl implements DestinationRecommender
             destinations.add(new Destination(city, country));
         }
         return destinations;
+    }
+
+    @GetMapping("/error")
+    public String getErrorPage() {
+        return "error";
     }
 }

@@ -6,7 +6,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Travel Form</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap">
+    <!-- Include Material-UI CSS (you can also use a local copy) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <style>
+             /* Center the destination card */
+         .destination-card {
+             max-width: 400px;
+             margin: 0 auto;
+             padding: 20px;
+             border: 1px solid #ccc;
+             background-color: #f9f9f9;
+             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+         }
+
+        /* Style for the "Select destination" button */
+        .select-button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: block; /* Make the button a block element */
+            margin-top: 10px; /* Add some spacing between text and button */
+        }
+
+        .select-button:hover {
+            background-color: #0056b3;
+        }
         .form-container {
             display: block; /* Initially visible */
             max-width: 400px;
@@ -17,10 +45,23 @@
             background-color: #f9f9f9;
         }
 
-
         .hidden {
             display: none; /* Hidden after form submission */
         }
+        /* Style for the destination card */
+             ol {
+                 counter-reset: item;
+                 list-style-type: none;
+                 align-self: center;
+             }
+
+             li::before {
+                 content: counter(item) ".";
+                 counter-increment: item;
+                 font-weight: bold;
+                 margin-right: 10px;
+             }
+
     </style>
 </head>
 <body>
@@ -76,11 +117,15 @@
 </div>
 <div th:if="${destinations != null and not #lists.isEmpty(destinations)}" class="destination-list">
     <h3>Your Recommendations:</h3>
-    <ul>
+    <ol>
         <li th:each="destination : ${destinations}">
-            <span th:text="${destination.city}"></span>, <span th:text="${destination.country}"></span>
+            <div class="destination-card">
+                <span th:text="${destination.city}"></span>, <span th:text="${destination.country}"></span>
+                <button class="select-button">Select destination</button>
+            </div>
         </li>
-    </ul>
+    </ol>
 </div>
+
 </body>
 </html>

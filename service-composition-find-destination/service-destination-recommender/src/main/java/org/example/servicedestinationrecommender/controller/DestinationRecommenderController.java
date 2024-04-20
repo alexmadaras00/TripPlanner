@@ -4,6 +4,7 @@ import org.example.servicedestinationrecommender.data.TripForm;
 import org.example.servicedestinationrecommender.domain.Destination;
 import org.example.servicedestinationrecommender.service.DestinationRecommenderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,7 +28,7 @@ public class DestinationRecommenderController {
         return "home";
     }
     @PostMapping("/recommendation-list")
-    public String getRecommendations(@ModelAttribute TripForm tripForm, Model model) throws IOException {
+    public String getRecommendations(@ModelAttribute TripForm tripForm, Model model) throws IOException, JSONException {
         List<Destination> destinationList = destinationRecommenderService.getRecommendations(tripForm);
 
         model.addAttribute("destinations",destinationList);

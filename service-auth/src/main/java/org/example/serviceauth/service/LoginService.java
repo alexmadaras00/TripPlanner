@@ -80,7 +80,6 @@ public class LoginService {
                 .signWith(key)
                 .compact();
     }
-
     public static String getUsernameFromToken(String token) {
         SecretKey key = Keys.hmacShaKeyFor(SECRET_KEY);
         Jws<Claims> claims = Jwts.parserBuilder()

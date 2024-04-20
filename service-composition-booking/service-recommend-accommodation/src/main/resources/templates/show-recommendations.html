@@ -27,11 +27,6 @@
     </style>
 </head>
 <body>
-<header>
-    <b>Coordinates: </b>
-    <h2 th:text="${coordinates}"></h2>
-    <b>List of Hotels:</b>
-</header>
 <div th:each="hotel : ${recommendationList}">
     <h2 th:text="${hotel.name}"></h2>
     <p>Chain Code: <span th:text="${hotel.chainCode}"></span></p>

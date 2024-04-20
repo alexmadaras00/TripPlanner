@@ -6,9 +6,9 @@
 </head>
 <body>
 <div th:if="${loginError}" class="alert alert-danger">Invalid username or password.</div>
-<form th:action="@{/login}" method="post" th:object="${user}">
-    <div><label> User Name: <input type="text" name="username" th:field="*{username}"/> </label></div>
-    <div><label> Password: <input type="password" name="password" th:field="*{password}"/> </label></div>
+<form th:action="/login" method="post" th:object="${user}">
+    <div><label> User Name : <input type="text" name="username" th:field="${user.username}"/> </label></div>
+    <div><label> Password: <input type="password" name="password" th:field="${user.password}"/> </label></div>
     <div><input type="submit" value="Sign In"/></div>
 </form>
 </body>

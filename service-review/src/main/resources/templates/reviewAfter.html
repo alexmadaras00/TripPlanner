@@ -45,7 +45,9 @@
 <div class="container">
     <h2>Review Form</h2>
     <form action="/reviewAfter" method="post">
-        <h3>After</h3>
+        <input type="hidden" id="bookingId" name="bookingId" th:value="${bookingId}">
+        <input type="hidden" id="tripId" name="tripId" th:value="${tripId}">
+
         <label for="arrived">How easy did you arrive to your destination using our route suggestion?</label>
         <input type="number" id="arrived" name="arrived" min="1" max="5" required>
 

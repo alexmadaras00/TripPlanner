@@ -45,6 +45,9 @@
 <div class="container">
     <h2>Review Form</h2>
     <form action="/reviewBefore" method="post">
+        <input type="hidden" id="bookingId" name="bookingId" th:value="${bookingId}">
+        <input type="hidden" id="tripId" name="tripId" th:value="${tripId}">
+
         <label for="destinations">Rate the destinations recommended (1 to 5 stars)</label>
         <input type="number" id="destinations" name="destinations" min="1" max="5" required>
 

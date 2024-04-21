@@ -27,6 +27,11 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.springframework.session:spring-session-core'
     compileOnly 'org.projectlombok:lombok'
+    implementation 'com.squareup.okhttp3:okhttp:4.9.3' // Use the latest version
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf:3.2.4'
+    implementation 'com.theokanning.openai-gpt3-java:api:0.18.2'
+    implementation 'com.theokanning.openai-gpt3-java:service:0.18.2'
+    implementation 'com.theokanning.openai-gpt3-java:client:0.18.2'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'org.postgresql:postgresql'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'

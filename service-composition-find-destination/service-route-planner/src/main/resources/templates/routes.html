@@ -64,6 +64,14 @@
                 }, function(response, status) {
                     if (status === 'OK') {
                         self.directionsRenderer.setDirections(response);
+                        // Calculate bounds of the route
+                        var bounds = new google.maps.LatLngBounds();
+                        var route = response.routes[0].overview_path;
+                        route.forEach(function(point) {
+                            bounds.extend(point);
+                        });
+                        // Adjust map's zoom level to fit the route
+                        self.map.fitBounds(bounds);
                     } else {
                         window.alert('Directions request failed due to ' + status);
                     }
@@ -160,15 +168,14 @@
 <style>
     #map {
         width: 80%;
-        height: 400px;
-        margin: 20px auto;
+        height: 80vh;
+        margin: 10vh auto 0px;
     }
 </style>
 <body th:data-source="${source}"
       th:data-destination="${destination}"
       onload="initMap(document.body.getAttribute('data-source'), document.body.getAttribute('data-destination'))"
 >
-    <h3>My Google Maps Demo</h3>
     <div id="map"></div>
 </body>
 </html>

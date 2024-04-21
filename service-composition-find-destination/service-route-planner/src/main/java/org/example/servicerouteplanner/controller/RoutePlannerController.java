@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
 import java.util.List;
@@ -20,14 +21,16 @@ public class RoutePlannerController {
     private RoutePlannerService routePlannerService;
 
     @GetMapping("/routes")
-    public String showRoutes(Model model) throws IOException, InterruptedException, ApiException {
-        String dest = "Helsinki";
-        String source = "Enschede";
-        List<Route> routes = routePlannerService.getRoutes(source,dest);
+    public String showRoutes(
+            Model model,
+            @RequestParam("source") String source,
+            @RequestParam("destination") String destination)
+    throws IOException, InterruptedException, ApiException {
+        List<Route> routes = routePlannerService.getRoutes(source, destination);
         model.addAttribute("googleMapsApiKey", googleMapsApiKey);
         model.addAttribute("routes", routes);
         model.addAttribute("source", source);
-        model.addAttribute("destination", dest);
+        model.addAttribute("destination", destination);
         return "routes";
     }
 }

@@ -24,8 +24,74 @@
     ({key: "AIzaSyDxS3k5ix72NvCWTjYVj5wnQCdJ3Y3O4no", v: "weekly"});</script>
 <!--    <script type="module" th:src="@{/script/initializeMap.js}"></script>-->
     <script>
+        var routeDisplay = new function() {
+            var self = this;
+            // Variables
+            self.directionsService;
+            self.directionsRenderer;
+            self.map;
+            self.origin;
+            self.destination;
+
+            // Functions
+            self.setup = function() {
+                self.directionsService = new google.maps.DirectionsService();
+                self.directionsRenderer = new google.maps.DirectionsRenderer({
+                    preserveViewport: true,
+                    suppressMarkers: true
+                });
+            }
+
+            self.setMap = function(map) {
+                self.map = map;
+                self.directionsRenderer.setMap(map);
+            }
+
+            self.setPoints = function(origin, destination) {
+                self.origin = origin;
+                self.destination = destination;
+            }
+
+            self.render = function() {
+                self.setup()
+                if (self.directionsRenderer.getMap() == null)
+                    self.directionsRenderer.setMap(self.map);
+
+                self.directionsService.route({
+                    origin: self.origin,
+                    destination: self.destination,
+                    travelMode: 'DRIVING'
+                }, function(response, status) {
+                    if (status === 'OK') {
+                        self.directionsRenderer.setDirections(response);
+                    } else {
+                        window.alert('Directions request failed due to ' + status);
+                    }
+                });
+            }
+
+            self.hide = function() {
+                self.directionsRenderer.setMap(null);
+            }
+
+            self.show = function() {
+                self.directionsRenderer.setMap(self.map);
+            }
+
+            self.toggleShow = function() {
+                self.directionsRenderer.map = (self.directionsRenderer.getMap() == null) ?
+                    self.map : null;
+            }
+
+            self.isAlreadyRendered = function(origin, destination) {
+                if (origin == self.origin && destination == self.destination) return true;
+                return false;
+            }
+        }
+
         async function initMap(source, destination) {
-            console.log(source, destination)
+            console.log(source, destination);
+
             const {Map} = await google.maps.importLibrary("maps");
             var myLatLang = {"lat": 52.21833, "lng": 6.89583}
             var options = {
@@ -39,6 +105,53 @@
             var directionsService = new google.maps.DirectionsService();
             var directionsDisplay = new google.maps.DirectionsRenderer();
             directionsDisplay.setMap(map);
+
+            try {
+                const response = await directionsService.route({
+                    origin: { query: source },
+                    destination: { query: destination },
+                    travelMode: google.maps.TravelMode.DRIVING,
+                });
+                const { startLL, endLL } = getData(response["routes"][0]["legs"][0]["steps"])
+
+                var start = new google.maps.Marker({
+                    position: startLL,
+                    map: map,
+                });
+
+                var end = new google.maps.Marker({
+                    position: endLL,
+                    map: map,
+                });
+
+                routeDisplay.setup();
+                routeDisplay.setMap(map);
+
+                var a = start.position;
+                var b = end.position;
+                if (routeDisplay.isAlreadyRendered(a, b)) routeDisplay.toggleShow();
+                else {
+                    routeDisplay.setPoints(a, b);
+                    routeDisplay.render();
+                }
+            } catch (error) {
+                console.error('Error getting directions:', error);
+            }
+        }
+
+        function getData(obj) {
+            const start_location = obj[0]["start_location"];
+            const end_location = obj.at(-1)["end_location"]
+            return {
+                startLL: {
+                    lat: start_location.lat(),
+                    lng: start_location.lng()
+                },
+                endLL: {
+                    lat: end_location.lat(),
+                    lng: end_location.lng()
+                }
+            }
         }
     </script>
     <link rel="stylesheet" type="text/css" th:src="@{/css/style.css}"/>
@@ -51,11 +164,11 @@
         margin: 20px auto;
     }
 </style>
-<body>
-
-<h3>My Google Maps Demo</h3>
-<!--The div element for the map -->
-<div id="map" th:attr="onload|@{'initMap(' + ${source} + ',' + ${destination} + ')'}|"></div>
-
+<body th:data-source="${source}"
+      th:data-destination="${destination}"
+      onload="initMap(document.body.getAttribute('data-source'), document.body.getAttribute('data-destination'))"
+>
+    <h3>My Google Maps Demo</h3>
+    <div id="map"></div>
 </body>
 </html>

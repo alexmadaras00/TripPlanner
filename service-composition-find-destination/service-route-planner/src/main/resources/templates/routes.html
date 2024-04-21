@@ -3,7 +3,8 @@
 <head>
     <title>Add Map</title>
     <script>(g => {
-        let h, a, k, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary", q = "__ib__", m = document,
+        let h, a, k, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary", q = "__ib__",
+            m = document,
             b = window;
         b = b[c] || (b[c] = {});
         const d = b.maps || (b.maps = {}), r = new Set, e = new URLSearchParams,
@@ -21,22 +22,40 @@
         d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n))
     })
     ({key: "AIzaSyDxS3k5ix72NvCWTjYVj5wnQCdJ3Y3O4no", v: "weekly"});</script>
-    <script type="module" th:src="@{/script/initializeMap.js}"></script>
+<!--    <script type="module" th:src="@{/script/initializeMap.js}"></script>-->
+    <script>
+        async function initMap(source, destination) {
+            console.log(source, destination)
+            const {Map} = await google.maps.importLibrary("maps");
+            var myLatLang = {"lat": 52.21833, "lng": 6.89583}
+            var options = {
+                center: myLatLang,
+                zoom: 7,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            };
+            var map = new google.maps.Map(document.getElementById("map"), options);
 
+
+            var directionsService = new google.maps.DirectionsService();
+            var directionsDisplay = new google.maps.DirectionsRenderer();
+            directionsDisplay.setMap(map);
+        }
+    </script>
     <link rel="stylesheet" type="text/css" th:src="@{/css/style.css}"/>
 
 </head>
 <style>
-    #map{
-        height:500px;
-        width:500px;
+    #map {
+        width: 80%;
+        height: 400px;
+        margin: 20px auto;
     }
 </style>
 <body>
 
 <h3>My Google Maps Demo</h3>
 <!--The div element for the map -->
-<div id="map"></div>
+<div id="map" th:attr="onload|@{'initMap(' + ${source} + ',' + ${destination} + ')'}|"></div>
 
 </body>
 </html>

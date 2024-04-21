@@ -1,8 +1,7 @@
-package org.example.tripplanner.services.booking.select_accommodation;
+package org.example.serviceviewaccommodation.services;
 
 
-import org.example.tripplanner.domain.booking.HotelOfferResponse;
-
+import org.example.servicerecommendaccommodation.domain.HotelOfferResponse;
 
 public interface SelectAccommodation {
         HotelOfferResponse receiveOffer(String hotelID) ;

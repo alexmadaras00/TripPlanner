@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Confirm</title>
+    <style>
+        /* Add your CSS styles here */
+    </style>
+</head>
+<body>
+<h2>Hotel Booking Details</h2>
+<div th:each="booking : ${hotelBookings.data}">
+    <h3 th:text="${booking.type}"></h3>
+    <p><strong>ID:</strong> <span th:text="${booking.id}"></span></p>
+    <p><strong>Provider Confirmation ID:</strong> <span th:text="${booking.providerConfirmationId}"></span></p>
+    <div th:each="record : ${booking.associatedRecords}">
+        <p><strong>Reference:</strong> <span th:text="${record.reference}"></span></p>
+        <p><strong>Origin System Code:</strong> <span th:text="${record.originSystemCode}"></span></p>
+    </div>
+    <button th:action="">Proceed to menu</button>
+</div>
+
+</body>
+</html>

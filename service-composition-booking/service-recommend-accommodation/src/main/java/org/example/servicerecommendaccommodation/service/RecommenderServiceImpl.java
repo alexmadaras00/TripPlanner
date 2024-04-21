@@ -3,9 +3,9 @@ package org.example.servicerecommendaccommodation.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import data.Hotel;
+
+import org.example.servicerecommendaccommodation.data.Hotel;
 import jakarta.annotation.PostConstruct;
-import org.example.bookingservicecomposition.AmadeusConfig;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -23,7 +23,7 @@ import reactor.core.publisher.Mono;
 import java.util.ArrayList;
 
 @Service
-public class RecommenderServiceImpl extends AmadeusConfig implements RecommenderService {
+public class RecommenderServiceImpl implements RecommenderService {
 
     @Value("${amadeus.clientId}")
     private String apiKey;

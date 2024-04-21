@@ -1,6 +1,6 @@
 package org.example.servicerecommendaccommodation.service;
 
-import data.Hotel;
+import org.example.servicerecommendaccommodation.data.Hotel;
 import org.json.JSONException;
 
 import java.util.ArrayList;

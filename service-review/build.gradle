@@ -27,9 +27,11 @@ ext {
 }
 
 dependencies {
+
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation 'org.webjars:sockjs-client:1.1.2'
+    implementation 'org.webjars:stomp-websocket:2.3.3'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf:3.2.4'
-    implementation 'redis.clients:jedis:5.0.0'
-    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.springframework.modulith:spring-modulith-starter-core'

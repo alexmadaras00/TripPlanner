@@ -1,4 +1,4 @@
-package org.example.servicerecommendaccommodation.domain;
+package org.example.serviceviewaccommodation.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

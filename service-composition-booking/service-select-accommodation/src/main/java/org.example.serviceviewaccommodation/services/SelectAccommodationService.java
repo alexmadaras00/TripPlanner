@@ -1,8 +1,8 @@
 package org.example.serviceviewaccommodation.services;
 
 
-import org.example.servicerecommendaccommodation.domain.HotelOfferResponse;
+import org.example.serviceviewaccommodation.domain.HotelOfferResponse;
 
-public interface SelectAccommodation {
+public interface SelectAccommodationService {
         HotelOfferResponse receiveOffer(String hotelID) ;
 }

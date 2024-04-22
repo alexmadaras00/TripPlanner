@@ -22,8 +22,11 @@ public class ScheduleActivitiesController {
     @Autowired
     private ScheduleActivitiesService scheduleActivitiesService;
     @GetMapping("/schedule")
-    public String getForm(@ModelAttribute TripForm tripForm, Model model){
+    public String getForm(@ModelAttribute TripForm tripForm, Model model) throws JSONException, IOException {
         model.addAttribute("tripForm",tripForm);
+        String destination = "Warsaw";
+        List<Day> schedulePlan = scheduleActivitiesService.getActivities(tripForm, destination);
+        model.addAttribute("schedule", schedulePlan);
         return "schedule-activities";
     }
 
@@ -34,7 +37,6 @@ public class ScheduleActivitiesController {
         List<Day> schedulePlan = scheduleActivitiesService.getActivities(tripForm, destination);
         model.addAttribute("destination", destination);
         model.addAttribute("schedule", schedulePlan);
-
         return "schedule-activities";
     }
 

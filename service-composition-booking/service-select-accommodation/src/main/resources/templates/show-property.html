@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
-<head th:object="${hotelOfferResponse}">
+<html xmlns:th="http://www.thymeleaf.org" lang="en" >
+<head th:object="${offers}">
     <meta charset="UTF-8">
     <title>TripPlanner - Selected Property</title>
     <style>
@@ -24,8 +24,12 @@
         }
     </style>
 </head>
-<body>
-<div th:each="offer : ${hotelOfferResponse.data}">
+<body onload="document.forms['myForm'].submit()">
+<div th:class="${offers == null or offers.isEmpty()} ? '' : 'hidden'">
+    <form id="myForm" th:if="${offers.isEmpty() or offers == null}" th:action="@{/show-property}" method="post" style="display: none;">
+    </form>
+</div>
+<div th:each="offer : ${offers}">
     <header><strong th:text="${offer.hotel.getDupeId()}"></strong></header>
     <h2><strong>Type: </strong><a th:text="${offer.type}"></a></h2>
     <div th:each="hotelOffer : ${offer.getOffers()}">
@@ -55,12 +59,29 @@
                 <td th:text="${hotelOffer.policies.paymentType}"></td>
             </tr>
         </table>
-        <form style="margin-top: 4vh" th:action="@{'/bookProperty/' + ${hotelOffer.getId()}}" method="post">
-        <input type="hidden" name="hotelId" th:value="${hotelOffer.getId()}">
-        <button type="submit">Book it!</button>
-        </form>
+<!--        <form style="margin-top: 4vh" th:action="@{'/bookProperty/' + ${hotelOffer.getId()}}" method="post">&ndash;&gt;-->
+<!--        <input type="hidden" name="hotelId" th:value="${hotelOffer.getId()}">-->
+<!--        <button type="submit">Book it!</button>-->
+<!--        </form>-->
     </div>
 
 </div>
+<script>
+    if (!localStorage.getItem('formSubmitted')) {
+        document.addEventListener("DOMContentLoaded", function () {
+            setTimeout(function () {
+                var form = document.getElementById("myForm");
+                var xhr = new XMLHttpRequest();
+                xhr.open(form.method, form.action);
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        localStorage.setItem('formSubmitted', 'true');
+                    }
+                };
+                xhr.send(new FormData(form));
+            }, 5000);  // Delay of 5 seconds
+        });
+    }
+</script>
 </body>
 </html>

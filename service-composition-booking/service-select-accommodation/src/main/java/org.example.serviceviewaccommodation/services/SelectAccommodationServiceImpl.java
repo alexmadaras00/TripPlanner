@@ -4,7 +4,7 @@ import jakarta.annotation.PostConstruct;
 
 import lombok.SneakyThrows;
 
-import org.example.servicerecommendaccommodation.domain.HotelOfferResponse;
+import org.example.serviceviewaccommodation.domain.HotelOfferResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.configurationprocessor.json.JSONException;
@@ -22,7 +22,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Objects;
 
 @Service
-public class SelectAccommodationImpl implements SelectAccommodation {
+public class SelectAccommodationServiceImpl implements SelectAccommodationService {
     @Value("${amadeus.clientId}")
     private String apiKey;
 
@@ -60,7 +60,7 @@ public class SelectAccommodationImpl implements SelectAccommodation {
         HttpHeaders headers = new HttpHeaders();
         String accessToken = authenticate();
         headers.add("Authorization", "Bearer " + accessToken);
-        return new HttpEntity<>( headers);
+        return new HttpEntity<>(headers);
     }
 
     @SneakyThrows

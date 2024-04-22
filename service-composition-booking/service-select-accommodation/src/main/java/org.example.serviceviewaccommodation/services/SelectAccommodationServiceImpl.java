@@ -1,13 +1,14 @@
-package org.example.tripplanner.services.booking.select_accommodation;
+package org.example.serviceviewaccommodation.services;
 
 import jakarta.annotation.PostConstruct;
-import org.example.tripplanner.domain.booking.HotelOfferResponse;
-import org.example.tripplanner.services.booking.AmadeusConfig;
-import org.example.tripplanner.utils.Print;
-import org.json.JSONException;
-import org.json.JSONObject;
+
+import lombok.SneakyThrows;
+
+import org.example.serviceviewaccommodation.domain.HotelOfferResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.configurationprocessor.json.JSONException;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -21,7 +22,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Objects;
 
 @Service
-public class SelectAccommodationImpl extends AmadeusConfig implements SelectAccommodation {
+public class SelectAccommodationServiceImpl implements SelectAccommodationService {
     @Value("${amadeus.clientId}")
     private String apiKey;
 
@@ -31,14 +32,13 @@ public class SelectAccommodationImpl extends AmadeusConfig implements SelectAcco
     @Autowired
     RestTemplateBuilder restTemplateBuilder;
     RestTemplate restTemplate;
-    Print print = new Print();
 
     @PostConstruct
     public void init() {
         restTemplate = restTemplateBuilder.build();
     }
 
-    protected String authenticate() {
+    protected String authenticate() throws JSONException {
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
@@ -60,17 +60,16 @@ public class SelectAccommodationImpl extends AmadeusConfig implements SelectAcco
         HttpHeaders headers = new HttpHeaders();
         String accessToken = authenticate();
         headers.add("Authorization", "Bearer " + accessToken);
-        return new HttpEntity<>( headers);
+        return new HttpEntity<>(headers);
     }
 
+    @SneakyThrows
     @Override
-    public HotelOfferResponse receiveOffer(String hotelID) throws JSONException {
+    public HotelOfferResponse receiveOffer(String hotelID) {
         HttpEntity<String> entity = buildRestTemplate();
 
-        print.print(this.getClass(),"HotelIDS: "+ hotelID);
-
         ResponseEntity<HotelOfferResponse> response = restTemplate.exchange("https://test.api.amadeus.com/v3/shopping/hotel-offers?hotelIds="+hotelID, HttpMethod.GET, entity, HotelOfferResponse.class);
-        print.print(this.getClass(),"Response: "+ Objects.requireNonNull(response.getBody()).getData().get(0).getHotel().getName());
+        System.out.println("Response: "+ Objects.requireNonNull(response.getBody()).getData().get(0).getHotel().getName());
         return response.getBody();
     }
 }

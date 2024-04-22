@@ -5,40 +5,27 @@
     <title>Booking</title>
 </head>
 <body>
-<form action="/confirmation" method="post" th:object="${bookingForm}">
+<form th:action="@{/confirmation}" method="post" th:object="${bookingForm}">
     <div th:each="guest, stat : *{data.guests}">
         <h3>Guest Details</h3>
-        <a>Info</a>
         <label>
             <input type="text"  th:field="*{data.guests[__${stat.index}__].name.title}" placeholder="Title" required>
             <input type="text"  th:field="*{data.guests[__${stat.index}__].name.firstName}" placeholder="First Name" required>
             <input type="text"  th:field="*{data.guests[__${stat.index}__].name.lastName}" placeholder="Last Name" required>
-        </label>
-        <label>
-            <a>Contact</a>
             <input type="text"  th:field="*{data.guests[__${stat.index}__].contact.phone}" placeholder="Phone" required>
             <input type="text"  th:field="*{data.guests[__${stat.index}__].contact.email}" placeholder="E-mail" required>
         </label>
     </div>
+    <div th:each="payment, stat : *{data.payments}">
+        <h3>Payment Details</h3>
+        <label>
+            <input type="text" value="Credit Card"  th:field="*{data.payments[__${stat.index}__].method}" placeholder="Payment Method" required>
+            <input type="text"  th:field="*{data.payments[__${stat.index}__].card.vendorCode}" placeholder="Card Vendor Code" required>
+            <input type="text"  th:field="*{data.payments[__${stat.index}__].card.cardNumber}" placeholder="Card Number" required>
+            <input type="text"  th:field="*{data.payments[__${stat.index}__].card.expiryDate}" placeholder="Expiry Date" required>
+        </label>
+    </div>
+    <input type="submit" value="Submit">
 </form>
-
-
-<script>
-    $('#paymentMethod').change(function () {
-        var method = $(this).val();
-        $('#paymentDetails').empty();
-        if (method === 'creditCard') {
-            $('#paymentDetails').append(`
-                        <label>
-                            <input type="text" th:field="*{data.payments[0].card.vendorCode}" placeholder="Card Vendor Code" required>
-                        </label>
-                        <!-- Add more fields as needed -->
-                    `);
-        }
-        // Add more conditions as needed for other payment methods
-    });
-    })
-    ;
-</script>
 </body>
 </html>

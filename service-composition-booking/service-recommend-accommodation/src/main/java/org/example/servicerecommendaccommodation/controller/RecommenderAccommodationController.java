@@ -38,7 +38,7 @@ public class RecommenderAccommodationController {
         return new ModelAndView("show-recommendations", model.asMap());
     }
     @RequestMapping("/view-accommodation")
-    public String performAction(@RequestBody ) {
-        return "redirect:http://localhost:8082/view-accommodation+";
+    public String performAction(@ModelAttribute("hotelId") String hotelId ) {
+        return "redirect:http://localhost:8082/view-accommodation?hotelID="+hotelId;
     }
 }

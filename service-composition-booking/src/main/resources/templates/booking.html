@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Booking</title>
+</head>
+<script>
+    $(document).ready(function() {
+        var iframeSrc = $('iframe').attr('src');
+        if (iframeSrc == 'http://localhost:8083/recommend') {
+            // do something
+        }
+    });
+
+</script>
+<body>
+<iframe th:src="@{${serviceUrl}}"></iframe>
+
+<form th:action="@{/view-accommodation}" method="post">
+    <button>View Accommodation</button>
+</form>
+
+<form th:action="@{/book-accommodation}" method="post">
+    <button>Book Accommodation</button>
+</form>
+</body>
+</html>

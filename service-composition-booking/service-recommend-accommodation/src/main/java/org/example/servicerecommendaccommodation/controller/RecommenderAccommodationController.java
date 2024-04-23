@@ -8,9 +8,7 @@ import org.example.servicerecommendaccommodation.service.RecommenderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.ArrayList;
@@ -31,13 +29,16 @@ public class RecommenderAccommodationController {
     }
     @SneakyThrows
     @PostMapping("/recommend")
-    public ModelAndView showRecommendations(@ModelAttribute TripForm tripForm, Model model, HttpServletRequest request) {
-        String city = tripForm.getCity();
-        String cityCode = recommenderService.getCityCode(tripForm.getCity());
+    public ModelAndView showRecommendations(@RequestParam("city") String city, Model model, HttpServletRequest request) {
+        String cityCode = recommenderService.getCityCode(city);
         System.out.println("City code: " + cityCode);
         model.addAttribute("cityCode", cityCode);
         model.addAttribute("recommendationList", recommenderService.searchHotelsByCityCode(cityCode));
         request.getSession().setAttribute("city", city);
         return new ModelAndView("show-recommendations", model.asMap());
+    }
+    @RequestMapping("/view-accommodation")
+    public String performAction(@RequestBody ) {
+        return "redirect:http://localhost:8082/view-accommodation+";
     }
 }

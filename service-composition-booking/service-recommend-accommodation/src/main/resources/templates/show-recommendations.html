@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Payment Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .hotel {
+            border: 1px solid #ddd;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .hotel h2 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .hotel p {
+            margin: 0 0 10px;
+        }
+    </style>
+</head>
+<body onload="document.forms['myForm'].submit()">
+<div th:class="${recommendationList == null or recommendationList.isEmpty()} ? '' : 'hidden'">
+    <form id="myForm" th:if="${recommendationList == null or recommendationList.isEmpty()}" th:action="@{/recommend}"
+          method="post" style="display: none;">
+    </form>
+</div>
+<div class="container" id="hotelContainer" th:object="${recommendationList}" th:if="${recommendationList != null}">
+    <div class="hotel" th:each="hotel : ${recommendationList}">
+        <h2 th:text="${hotel.name}"></h2>
+        <p>Chain Code: <span th:text="${hotel.chainCode}"></span></p>
+        <p>IATA Code: <span th:text="${hotel.iataCode}"></span></p>
+        <p>Hotel ID: <span th:text="${hotel.hotelId}"></span></p>
+        <p>Address: <span th:text="${hotel.address.description}"></span></p>
+        <p>Country Code: <span th:text="${hotel.address.countryCode}"></span></p>
+        <p th:if="${hotel.distance != null and hotel.distance.description != null}">Distance: <span
+                th:text="${hotel.distance.description}"></span></p>
+        <form th:action="@{/view-accommodation}" method="post">
+            <input type="hidden" name="hotelId" th:field="" th:value="${hotel.hotelId}">
+            <button type="submit">See offers</button>
+        </form>
+        <hr>
+    </div>
+</div>
+<script>
+    if (!localStorage.getItem('formSubmitted')) {
+        document.addEventListener("DOMContentLoaded", function () {
+            setTimeout(function () {
+                var form = document.getElementById("myForm");
+                var xhr = new XMLHttpRequest();
+                xhr.open(form.method, form.action);
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        localStorage.setItem('formSubmitted', 'true');
+                    }
+                };
+                xhr.send(new FormData(form));
+            }, 5000);  // Delay of 5 seconds
+        });
+    }
+</script>
+
+</body>
+</html>

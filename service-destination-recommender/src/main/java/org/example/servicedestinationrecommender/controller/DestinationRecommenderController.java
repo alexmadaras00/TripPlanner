@@ -64,62 +64,9 @@ public class DestinationRecommenderController {
     }
 
     @PostMapping("/planner/{city:^.*$}")
-    public String goToPlannerService(@ModelAttribute("tripForm") TripForm tripForm, @PathVariable(required = false) String city, @RequestParam String country) throws JsonProcessingException {
-        String planningServiceCompositionUrl = "http://localhost:8890/planner";
-        System.out.println("Redirect");
-
-        System.out.println(city);
-        System.out.println(country);
-        Destination selectedDestination = new Destination(city, country);
-        logger.info("Redirect");
-        // Create a RestTemplate instance
-        RestTemplate restTemplate = new RestTemplate();
-        // Create Http Headers
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Content-Type", "application/json");
-        JSONObject dataObject = new JSONObject();
-        ObjectMapper mapper = new ObjectMapper();
-        String tripFormJson = mapper.writeValueAsString(tripForm);
-        JSONObject tripFormJsonObject = new JSONObject(tripFormJson);
-        String selectedDestinationJson = mapper.writeValueAsString(selectedDestination);
-        JSONObject destinationJsonObject = new JSONObject(selectedDestinationJson);
-
-        dataObject.put("selectedDestination", destinationJsonObject);
-        dataObject.put("tripForm", tripFormJsonObject);  // This line is added
-        // Create Http Entity
-        System.out.println(dataObject.get("tripForm").toString());
-        System.out.println(dataObject.get("selectedDestination").toString());
-        // Send POST request to Planning Service Composition with the recommendations
-        System.out.println("URL: " + planningServiceCompositionUrl);
-        System.out.println("Headers: " + headers);
-
-        ResponseEntity<String> response = null;
-        String responseBody = "";
-        try {
-            HttpEntity<String> request = new HttpEntity<>(dataObject.toString(), headers);
-            System.out.println("Request:" +request);
-            response = restTemplate.postForEntity(planningServiceCompositionUrl,request,String.class);
-            responseBody = response.getBody();
-            System.out.println("Body: "+ responseBody);
-        } catch (RestClientException e) {
-            e.printStackTrace();
-            System.out.println(e.getStackTrace().toString());
-            return "error";
-        }
-
-
-        logger.info("Response: {}", responseBody);
-        // Check response status code and handle accordingly
-        if (response.getStatusCode().is2xxSuccessful()) {
-            System.out.println("success");
-            return "redirect:http://localhost:8085/route";
-        } else {
-            System.out.println("Failed to send recommendations to Planning Service Composition");
-            return "error";
-        }
-
+    public String goToPlannerService(@ModelAttribute("tripForm") TripForm tripForm, @PathVariable(required = false) String city, @RequestParam String country) {
+        return "redirect:http://localhost:8890/planner?source=" + tripForm.getHomeLocation() + "&destination=" + city + "," + country;
     }
-
 
 
 }

@@ -28,28 +28,20 @@ public class RoutePlannerController {
     private RoutePlannerService routePlannerService;
 
     @GetMapping("/routes")
-    public String loadRoutes(Model model) {
+    public String loadRoutes(@RequestParam("source") String source,
+                             @RequestParam("destination") String destination, Model model) {
         model.addAttribute("googleMapsApiKey", googleMapsApiKey);
-
-        return "routes";
-    }
-
-    @PostMapping("/routes")
-    public String showRoutes(@RequestBody JSONObject dataFromDestinationRecommender, Model model) throws JSONException, IOException, InterruptedException, ApiException {
         try {
-            JSONObject tripFormJson = dataFromDestinationRecommender.getJSONObject("tripForm");
-            JSONObject selectedDestinationJson = dataFromDestinationRecommender.getJSONObject("selectedDestination");
-            System.out.println(tripFormJson);
-            String source = tripFormJson.getString("home");
-            String destination = selectedDestinationJson.getString("city") + "," + selectedDestinationJson.getString("country");
             List<Route> routes = routePlannerService.getRoutes(source, destination);
             model.addAttribute("source", source);
             model.addAttribute("destination", destination);
             model.addAttribute("routes", routes);
-        } catch (JSONException e) {
+        } catch (IOException | InterruptedException | ApiException e) {
             System.out.println("Error parsing JSON: " + e.getMessage());
             return "error";
         }
         return "routes";
     }
+
+
 }

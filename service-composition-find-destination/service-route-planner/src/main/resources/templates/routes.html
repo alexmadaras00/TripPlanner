@@ -1,7 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" >
 <head>
     <title>Add Map</title>
+    <style>
+        .select-button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: block; /* Make the button a block element */
+            margin-top: 10px; /* Add some spacing between text and button */
+        }
+    </style>
     <script>
         if (!localStorage.getItem('formSubmitted')) {
             document.addEventListener("DOMContentLoaded", function () {
@@ -189,16 +201,22 @@
         margin: 10vh auto 0px;
     }
 </style>
-<body onload="document.forms['myForm'].submit()" th:data-source="${source}"
-      th:data-destination="${destination}"
-      onload="initMap(document.body.getAttribute('data-source'), document.body.getAttribute('data-destination'))"
->
+<body th:data-source="${source}" th:data-destination="${destination}">
+<script>
+    window.onload = function() {
+        initMap(document.body.getAttribute('data-source'), document.body.getAttribute('data-destination'))
+            .then(() => {
+                document.forms['myForm'].submit();
+            });
+    }
+
+</script>
 <div th:class="${destination == null or source == null} ? '' : 'hidden'">
-    <form id="myForm" th:if="${destination == null or source == null}" th:action="@{/route}" method="post"
-          style="display: none;">
         <div id="map"></div>
-    </form>
 </div>
+<form th:action="@{/schedule}" method="post">
+    <button type="submit" class="select-button">Proceed</button>
+</form>
 
 </body>
 </html>

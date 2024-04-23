@@ -2,6 +2,23 @@
 <html lang="en">
 <head>
     <title>Add Map</title>
+    <script>
+        if (!localStorage.getItem('formSubmitted')) {
+            document.addEventListener("DOMContentLoaded", function () {
+                setTimeout(function () {
+                    var form = document.getElementById("myForm");
+                    var xhr = new XMLHttpRequest();
+                    xhr.open(form.method, form.action);
+                    xhr.onreadystatechange = function() {
+                        if (xhr.readyState === 4 && xhr.status === 200) {
+                            localStorage.setItem('formSubmitted', 'true');
+                        }
+                    };
+                    xhr.send(new FormData(form));
+                }, 5000);  // Delay of 5 seconds
+            });
+        }
+    </script>
     <script>(g => {
         let h, a, k, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary", q = "__ib__",
             m = document,
@@ -22,9 +39,9 @@
         d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n))
     })
     ({key: "AIzaSyDxS3k5ix72NvCWTjYVj5wnQCdJ3Y3O4no", v: "weekly"});</script>
-<!--    <script type="module" th:src="@{/script/initializeMap.js}"></script>-->
+    <!--    <script type="module" th:src="@{/script/initializeMap.js}"></script>-->
     <script>
-        var routeDisplay = new function() {
+        var routeDisplay = new function () {
             var self = this;
             // Variables
             self.directionsService;
@@ -34,7 +51,7 @@
             self.destination;
 
             // Functions
-            self.setup = function() {
+            self.setup = function () {
                 self.directionsService = new google.maps.DirectionsService();
                 self.directionsRenderer = new google.maps.DirectionsRenderer({
                     preserveViewport: true,
@@ -42,17 +59,17 @@
                 });
             }
 
-            self.setMap = function(map) {
+            self.setMap = function (map) {
                 self.map = map;
                 self.directionsRenderer.setMap(map);
             }
 
-            self.setPoints = function(origin, destination) {
+            self.setPoints = function (origin, destination) {
                 self.origin = origin;
                 self.destination = destination;
             }
 
-            self.render = function() {
+            self.render = function () {
                 self.setup()
                 if (self.directionsRenderer.getMap() == null)
                     self.directionsRenderer.setMap(self.map);
@@ -61,13 +78,13 @@
                     origin: self.origin,
                     destination: self.destination,
                     travelMode: 'DRIVING'
-                }, function(response, status) {
+                }, function (response, status) {
                     if (status === 'OK') {
                         self.directionsRenderer.setDirections(response);
                         // Calculate bounds of the route
                         var bounds = new google.maps.LatLngBounds();
                         var route = response.routes[0].overview_path;
-                        route.forEach(function(point) {
+                        route.forEach(function (point) {
                             bounds.extend(point);
                         });
                         // Adjust map's zoom level to fit the route
@@ -78,20 +95,20 @@
                 });
             }
 
-            self.hide = function() {
+            self.hide = function () {
                 self.directionsRenderer.setMap(null);
             }
 
-            self.show = function() {
+            self.show = function () {
                 self.directionsRenderer.setMap(self.map);
             }
 
-            self.toggleShow = function() {
+            self.toggleShow = function () {
                 self.directionsRenderer.map = (self.directionsRenderer.getMap() == null) ?
                     self.map : null;
             }
 
-            self.isAlreadyRendered = function(origin, destination) {
+            self.isAlreadyRendered = function (origin, destination) {
                 if (origin == self.origin && destination == self.destination) return true;
                 return false;
             }
@@ -116,11 +133,11 @@
 
             try {
                 const response = await directionsService.route({
-                    origin: { query: source },
-                    destination: { query: destination },
+                    origin: {query: source},
+                    destination: {query: destination},
                     travelMode: google.maps.TravelMode.DRIVING,
                 });
-                const { startLL, endLL } = getData(response["routes"][0]["legs"][0]["steps"])
+                const {startLL, endLL} = getData(response["routes"][0]["legs"][0]["steps"])
 
                 var start = new google.maps.Marker({
                     position: startLL,
@@ -172,10 +189,16 @@
         margin: 10vh auto 0px;
     }
 </style>
-<body th:data-source="${source}"
+<body onload="document.forms['myForm'].submit()" th:data-source="${source}"
       th:data-destination="${destination}"
       onload="initMap(document.body.getAttribute('data-source'), document.body.getAttribute('data-destination'))"
 >
-    <div id="map"></div>
+<div th:class="${destination == null or source == null} ? '' : 'hidden'">
+    <form id="myForm" th:if="${destination == null or source == null}" th:action="@{/route}" method="post"
+          style="display: none;">
+        <div id="map"></div>
+    </form>
+</div>
+
 </body>
 </html>

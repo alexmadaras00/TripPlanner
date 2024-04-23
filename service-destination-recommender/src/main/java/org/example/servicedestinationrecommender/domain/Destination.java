@@ -18,4 +18,7 @@ public class Destination {
         this.city = city;
         this.country = country;
     }
+    public Destination(){
+
+    }
 }

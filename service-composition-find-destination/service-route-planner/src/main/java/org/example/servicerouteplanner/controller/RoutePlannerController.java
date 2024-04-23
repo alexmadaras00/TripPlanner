@@ -5,9 +5,16 @@ import org.example.servicerouteplanner.domain.Route;
 import org.example.servicerouteplanner.service.RoutePlannerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+
+import org.springframework.boot.configurationprocessor.json.JSONException;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
@@ -21,16 +28,28 @@ public class RoutePlannerController {
     private RoutePlannerService routePlannerService;
 
     @GetMapping("/routes")
-    public String showRoutes(
-            Model model,
-            @RequestParam("source") String source,
-            @RequestParam("destination") String destination)
-    throws IOException, InterruptedException, ApiException {
-        List<Route> routes = routePlannerService.getRoutes(source, destination);
+    public String loadRoutes(Model model) {
         model.addAttribute("googleMapsApiKey", googleMapsApiKey);
-        model.addAttribute("routes", routes);
-        model.addAttribute("source", source);
-        model.addAttribute("destination", destination);
+
+        return "routes";
+    }
+
+    @PostMapping("/routes")
+    public String showRoutes(@RequestBody JSONObject dataFromDestinationRecommender, Model model) throws JSONException, IOException, InterruptedException, ApiException {
+        try {
+            JSONObject tripFormJson = dataFromDestinationRecommender.getJSONObject("tripForm");
+            JSONObject selectedDestinationJson = dataFromDestinationRecommender.getJSONObject("selectedDestination");
+            System.out.println(tripFormJson);
+            String source = tripFormJson.getString("home");
+            String destination = selectedDestinationJson.getString("city") + "," + selectedDestinationJson.getString("country");
+            List<Route> routes = routePlannerService.getRoutes(source, destination);
+            model.addAttribute("source", source);
+            model.addAttribute("destination", destination);
+            model.addAttribute("routes", routes);
+        } catch (JSONException e) {
+            System.out.println("Error parsing JSON: " + e.getMessage());
+            return "error";
+        }
         return "routes";
     }
 }

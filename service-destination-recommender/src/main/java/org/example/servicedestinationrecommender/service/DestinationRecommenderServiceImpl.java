@@ -3,10 +3,10 @@ package org.example.servicedestinationrecommender.service;
 import okhttp3.*;
 import org.example.servicedestinationrecommender.data.TripForm;
 import org.example.servicedestinationrecommender.domain.Destination;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.configurationprocessor.json.JSONArray;
-import org.springframework.boot.configurationprocessor.json.JSONException;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -23,7 +23,7 @@ public class DestinationRecommenderServiceImpl implements DestinationRecommender
     private String apiKey;
 
     @Override
-    public List<Destination> getRecommendations(TripForm tripForm) throws IOException, JSONException {
+    public List<Destination> getRecommendations(TripForm tripForm) throws IOException {
         String promptText = "You are a seasoned travel advisor assisting a group of enthusiastic travelers. They've provided the following details for their upcoming trip: " +
                 "1. **Home**:" + tripForm.getHomeLocation() + " " +
                 "2. **Travel Period**:" + tripForm.getStartDate() + " to +" + tripForm.getEndDate() + " " +

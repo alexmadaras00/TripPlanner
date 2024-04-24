@@ -4,12 +4,6 @@ WORKDIR /app
 COPY . .
 RUN gradle bootJar
 
-FROM postgres:latest AS postgres-db
-
-ENV POSTGRES_DB postgres
-ENV POSTGRES_USER postgres
-ENV POSTGRES_PASSWORD potgres
-
 FROM amazoncorretto:21-alpine-jdk
 
 WORKDIR /app

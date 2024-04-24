@@ -58,7 +58,7 @@
     <h3>Hotels</h3>
     <ol>
         <li th:each="hotel : ${recommendationList}">
-            <form th:action="@{'/view-accommodation/'+ ${hotel.hotelId}}" method="post">
+            <form th:action="@{'/view-accommodation/'+ ${hotel.hotelId}+'?source='+ ${source} + '&destination=' + ${destination} + '&numberOfTravelers=' + ${numberOfTravelers} + '&motivation=' + ${motivation} + '&groupType=' + ${groupType} + '&startDate=' + ${startDate} + '&endDate=' + ${endDate} + '&budgetType=' + ${budgetType}}" method="post">
                 <h2 th:text="${hotel.name}"></h2>
                 <p>Chain Code: <span th:text="${hotel.chainCode}"></span></p>
                 <p>IATA Code: <span th:text="${hotel.iataCode}"></span></p>

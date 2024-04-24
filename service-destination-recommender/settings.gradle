@@ -8,4 +8,3 @@
  */
 
 rootProject.name = 'service-destination-recommender'
-include('app')

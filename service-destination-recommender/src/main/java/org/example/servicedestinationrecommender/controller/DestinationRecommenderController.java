@@ -1,7 +1,6 @@
 package org.example.servicedestinationrecommender.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.example.servicedestinationrecommender.data.Trip;
 import org.example.servicedestinationrecommender.data.TripForm;
 import org.example.servicedestinationrecommender.domain.Destination;
 import org.example.servicedestinationrecommender.service.DestinationRecommenderService;
@@ -65,6 +64,8 @@ public class DestinationRecommenderController {
 
     @PostMapping("/planner/{city:^.*$}")
     public String goToPlannerService(@ModelAttribute("tripForm") TripForm tripForm, @PathVariable(required = false) String city, @RequestParam String country) {
+        Trip t = new Trip(tripForm.getHomeLocation(), city + "," + country, tripForm.getNumberOfTravellers(), tripForm.getGroupType().toString(), tripForm.getMotivation().toString(), tripForm.getBudget().toString(), tripForm.getStartDate(), tripForm.getEndDate());
+        destinationRecommenderService.saveTrip(t);
         return "redirect:http://localhost:8890/planner?source=" + tripForm.getHomeLocation() + "&destination=" + city + "," + country;
     }
 

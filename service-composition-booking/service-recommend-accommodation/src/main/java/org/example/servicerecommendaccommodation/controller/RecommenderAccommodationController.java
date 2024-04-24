@@ -8,9 +8,7 @@ import org.example.servicerecommendaccommodation.service.RecommenderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.ArrayList;
@@ -20,24 +18,20 @@ import java.util.List;
 public class RecommenderAccommodationController {
     @Autowired
     private RecommenderService recommenderService;
-    @GetMapping("/recommend")
+    @GetMapping("/recommend-accommodation")
     public ModelAndView showInit(Model model, HttpServletRequest request) {
-        String city = "Warsaw";
+        String city = "London";
         String cityCode = recommenderService.getCityCode(city);
         ArrayList<Hotel> hotels = recommenderService.searchHotelsByCityCode(cityCode);
         model.addAttribute("recommendationList", hotels);
         request.getSession().setAttribute("city", city);
+        System.out.println("List: "+recommenderService.searchHotelsByCityCode(cityCode));
         return new ModelAndView("show-recommendations", model.asMap());
     }
-    @SneakyThrows
-    @PostMapping("/recommend")
-    public ModelAndView showRecommendations(@ModelAttribute TripForm tripForm, Model model, HttpServletRequest request) {
-        String city = tripForm.getCity();
-        String cityCode = recommenderService.getCityCode(tripForm.getCity());
-        System.out.println("City code: " + cityCode);
-        model.addAttribute("cityCode", cityCode);
-        model.addAttribute("recommendationList", recommenderService.searchHotelsByCityCode(cityCode));
-        request.getSession().setAttribute("city", city);
-        return new ModelAndView("show-recommendations", model.asMap());
+
+    @RequestMapping("/view-accommodation/{hotelID}")
+    public String performAction(@PathVariable(required = false) String hotelID ) {
+        System.out.println("id: "+hotelID);
+        return "redirect:http://localhost:8082/view-accommodation/"+hotelID;
     }
 }

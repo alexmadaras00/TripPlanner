@@ -5,9 +5,12 @@
     <title>Error</title>
 </head>
 <body>
-<h2 th:text="${error}"></h2>
-<form th:action="@{/book}" method="get">
+<h2 Error></h2>
+<form th:action="@{'/book/' + ${offerID}}" method="post">
     <button type="submit">Try Again</button>
+</form>
+<form th:action="@{'/recommendation-list'}" method="post">
+    <button type="submit">Go to the reviews</button>
 </form>
 
 

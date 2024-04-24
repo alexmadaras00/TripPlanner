@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Booking</title>
+</head>
+<style>
+    #serviceFrame{
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        top: 0;
+        border: none;
+        width: 100%;
+        height: 100%;
+    }
+</style>
+<body>
+<iframe id="serviceFrame" th:src="@{${serviceUrl}}"></iframe>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var serviceViewUrl = /*[[${serviceViewUrl}]]*/ 'serviceViewUrl';
+    var serviceBookUrl = /*[[${serviceBookUrl}]]*/ 'serviceBookUrl';
+    /*]]>*/
+</script>
+
+<script>
+    window.addEventListener('message', function(event) {
+        if (event.data === 'recommendAccommodation'){
+            document.querySelector('#serviceFrame').src = serviceRecommendUrl;
+        }
+        if (event.data === 'viewAccommodation') {
+            document.querySelector('#serviceFrame').src = serviceViewUrl;
+        } else if (event.data === 'bookAccommodation') {
+            document.querySelector('#serviceFrame').src = serviceBookUrl;
+        }
+    }, false);
+</script>
+</body>
+</html>

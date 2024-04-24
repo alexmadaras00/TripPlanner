@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en" >
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head th:object="${offers}">
     <meta charset="UTF-8">
     <title>TripPlanner - Selected Property</title>
@@ -18,53 +18,80 @@
             padding: 8px;
             text-align: left;
         }
+        li{
+            border: 1px solid #ddd;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
 
         th {
             background-color: #f2f2f2;
+        }
+        .select-button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: block; /* Make the button a block element */
+            margin-top: 10px; /* Add some spacing between text and button */
+        }
+
+        .select-button:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body onload="document.forms['myForm'].submit()">
 <div th:class="${offers == null or offers.isEmpty()} ? '' : 'hidden'">
-    <form id="myForm" th:if="${offers.isEmpty() or offers == null}" th:action="@{/show-property}" method="post" style="display: none;">
+    <form id="myForm" th:if="${offers.isEmpty() or offers == null}" th:action="@{/show-property}" method="post"
+          style="display: none;">
     </form>
 </div>
-<div th:each="offer : ${offers}">
-    <header><strong th:text="${offer.hotel.getDupeId()}"></strong></header>
-    <h2><strong>Type: </strong><a th:text="${offer.type}"></a></h2>
-    <div th:each="hotelOffer : ${offer.getOffers()}">
-        <table>
-            <tr>
-                <th>Check In Date</th>
-                <td th:text="${hotelOffer.checkInDate}"></td>
-            </tr>
-            <tr>
-                <th>Check Out Date</th>
-                <td th:text="${hotelOffer.checkOutDate}"></td>
-            </tr>
-            <tr>
-                <th>Rate Code</th>
-                <td th:text="${hotelOffer.rateCode}"></td>
-            </tr>
-            <tr>
-                <th>Room Type</th>
-                <td th:text="${hotelOffer.room.type}"></td>
-            </tr>
-            <tr>
-                <th>Price</th>
-                <td th:text="${hotelOffer.price.total+' '+hotelOffer.price.getCurrency()}"></td>
-            </tr>
-            <tr>
-                <th>Payment Type</th>
-                <td th:text="${hotelOffer.policies.paymentType}"></td>
-            </tr>
-        </table>
-<!--        <form style="margin-top: 4vh" th:action="@{'/bookProperty/' + ${hotelOffer.getId()}}" method="post">&ndash;&gt;-->
-<!--        <input type="hidden" name="hotelId" th:value="${hotelOffer.getId()}">-->
-<!--        <button type="submit">Book it!</button>-->
-<!--        </form>-->
-    </div>
-
+<div th:if="${offers != null and not #lists.isEmpty(offers)}" class="offers-list">
+    <ol>
+        <li th:each="offer : ${offers}">
+            <header><strong th:text="${offer.hotel.getDupeId()}"></strong></header>
+            <h2><strong>Type: </strong><a th:text="${offer.type}"></a></h2>
+            <div th:each="hotelOffer : ${offer.getOffers()}">
+                <form th:action="@{'/book/' + ${hotelOffer.id}}" method="post">
+                    <table>
+                        <tr>
+                            <th>Check In Date</th>
+                            <td th:text="${hotelOffer.checkInDate}"></td>
+                        </tr>
+                        <tr>
+                            <th>Check Out Date</th>
+                            <td th:text="${hotelOffer.checkOutDate}"></td>
+                        </tr>
+                        <tr>
+                            <th>Rate Code</th>
+                            <td th:text="${hotelOffer.rateCode}"></td>
+                        </tr>
+                        <tr>
+                            <th>Room Type</th>
+                            <td th:text="${hotelOffer.room.type}"></td>
+                        </tr>
+                        <tr>
+                            <th>Price</th>
+                            <td th:text="${hotelOffer.price.total+' '+hotelOffer.price.getCurrency()}"></td>
+                        </tr>
+                        <tr>
+                            <th>Payment Type</th>
+                            <td th:text="${hotelOffer.policies.paymentType}"></td>
+                        </tr>
+                    </table>
+                    <div>
+                        <span th:text="${hotelOffer.id}" hidden="hidden" ></span>
+                        <button type="submit" class="select-button">Select</button>
+                    </div>
+                </form>
+            </div>
+        </li>
+    </ol>
 </div>
 <script>
     if (!localStorage.getItem('formSubmitted')) {
@@ -73,7 +100,7 @@
                 var form = document.getElementById("myForm");
                 var xhr = new XMLHttpRequest();
                 xhr.open(form.method, form.action);
-                xhr.onreadystatechange = function() {
+                xhr.onreadystatechange = function () {
                     if (xhr.readyState === 4 && xhr.status === 200) {
                         localStorage.setItem('formSubmitted', 'true');
                     }

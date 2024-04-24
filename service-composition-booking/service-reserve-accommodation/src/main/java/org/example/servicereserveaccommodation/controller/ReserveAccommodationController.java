@@ -11,9 +11,7 @@ import org.example.servicereserveaccommodation.service.ReserveAccommodationServi
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,37 +22,53 @@ public class ReserveAccommodationController {
     @Autowired
     private ReserveAccommodationService reserveAccommodationService;
 
-    @GetMapping("/book")
-    public String bookTheAccommodation(Model model) {
+    @GetMapping("/book/{offerID}")
+    public String bookTheAccommodation(@PathVariable String offerID, Model model) {
         BookingForm bookingForm = new BookingForm();
+        System.out.println("OFFER ID: " + offerID);
         Data data = new Data();
-        data.setOfferId("NRPQNQBOJM");
+        data.setOfferId(offerID);
         data.setGuests(List.of(new Guest()));
         data.setPayments(List.of(new Data.Payment()));
         bookingForm.setData(data);
         model.addAttribute("bookingForm", bookingForm);
+        model.addAttribute("offerID", offerID);
         return "book";
     }
 
 
-    @PostMapping("/confirmation")
-    public String getConfirmation(@ModelAttribute BookingForm bookingForm, Model model) throws ResponseException {
-        bookingForm.getData().setOfferId("NRPQNQBOJM");
+    @PostMapping("/confirmation/{offerID}")
+    public String getConfirmation(@ModelAttribute BookingForm bookingForm, @PathVariable String offerID, Model model) throws ResponseException {
         BookingData bookingData = reserveAccommodationService.bookHotel(bookingForm);
-        if (bookingData.getData().get(0).getAssociatedRecords()!= null) {
+        System.out.println("booking data: "+ bookingData.getData());
+        if (bookingData.getData().get(0).getProviderConfirmationId()!=null) {
             model.addAttribute("hotelBookings", bookingData);
             return "confirmation";
         } else {
             String error = bookingData.getData().get(0).getType();
             model.addAttribute("error", error);
+            model.addAttribute("offerID", offerID);
+            System.out.println("Heere:" + offerID);
             System.out.println(bookingData.getData().get(0).getType());
             bookingData.setData(new ArrayList<>());
-            return "error";
+            return "redirect:/error-booking/" + offerID;
         }
     }
 
-    @GetMapping("/error-booking")
-    public String getErrorPage() {
+    @RequestMapping("/review")
+    public String goToReview() {
+        return "redirect:http://localhost:8082/review";
+    }
+
+    @GetMapping("/error-booking/{offerID}")
+    public String getErrorPage(@PathVariable String offerID, Model model) {
+        model.addAttribute("offerID", offerID);
         return "error";
+    }
+
+    @RequestMapping("/book/{offerID}")
+    public String getList(@PathVariable String offerID) {
+        System.out.println(offerID);
+        return "redirect:http://localhost:8082/book/" + offerID;
     }
 }

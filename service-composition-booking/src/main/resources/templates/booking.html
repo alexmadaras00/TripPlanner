@@ -17,7 +17,8 @@
     }
 </style>
 <body>
-<iframe id="serviceFrame" th:src="@{${serviceUrl}}"></iframe>
+
+<iframe id="serviceFrame" th:src="@{${serviceUrl} + '?source='+ ${source} + '&destination=' + ${destination} + '&numberOfTravelers=' + ${numberOfTravelers} + '&motivation=' + ${motivation} + '&groupType=' + ${groupType} + '&startDate=' + ${startDate} + '&endDate=' + ${endDate} + '&budgetType=' + ${budgetType}}"></iframe>
 <script th:inline="javascript">
     /*<![CDATA[*/
     var serviceViewUrl = /*[[${serviceViewUrl}]]*/ 'serviceViewUrl';

@@ -57,7 +57,7 @@ public class DestinationRecommenderController {
     public String goToPlannerService(@ModelAttribute("tripForm") TripForm tripForm, @PathVariable(required = false) String city, @RequestParam String country) {
         Trip t = new Trip(tripForm.getHomeLocation(), city + "," + country, tripForm.getNumberOfTravellers(), tripForm.getGroupType().toString(), tripForm.getMotivation().toString(), tripForm.getBudget().toString(), tripForm.getStartDate(), tripForm.getEndDate());
         destinationRecommenderService.saveTrip(t);
-        return "redirect:http://localhost:8890/planner?source=" + tripForm.getHomeLocation() + "&destination=" + city + "," + country+"&numberOfTravelers="+tripForm.getNumberOfTravellers()+"&motivation="+ tripForm.getMotivation()+"&groupType="+ tripForm.getGroupType()+"&startDate="+ tripForm.getStartDate()+"&endDate="+ tripForm.getEndDate()+"&budgetType="+ tripForm.getBudget();
+        return "redirect:http://localhost:8082/routes?source=" + tripForm.getHomeLocation() + "&destination=" + city + "," + country+"&numberOfTravelers="+tripForm.getNumberOfTravellers()+"&motivation="+ tripForm.getMotivation()+"&groupType="+ tripForm.getGroupType()+"&startDate="+ tripForm.getStartDate()+"&endDate="+ tripForm.getEndDate()+"&budgetType="+ tripForm.getBudget();
     }
 
 

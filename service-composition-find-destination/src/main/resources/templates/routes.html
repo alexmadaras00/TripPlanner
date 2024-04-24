@@ -216,9 +216,6 @@
 <div th:class="${destination == null or source == null} ? '' : 'hidden'">
         <div id="map"></div>
 </div>
-<form th:action="@{/schedule}" method="post">
-    <button type="submit" class="select-button">Proceed</button>
-</form>
-
+<a th:href="@{'/schedule?source='+ ${source} + '&destination=' + ${destination} + '&numberOfTravelers=' + ${numberOfTravelers} + '&motivation=' + ${motivation} + '&groupType=' + ${groupType} + '&startDate=' + ${startDate} + '&endDate=' + ${endDate} + '&budgetType=' + ${budgetType}}">Proceed</a>
 </body>
 </html>

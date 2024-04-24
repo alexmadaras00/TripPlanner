@@ -30,21 +30,28 @@ public class ScheduleActivitiesController {
     @Autowired
     private RoutePlannerService routePlannerService;
     @GetMapping("/schedule")
-    public String getForm(@ModelAttribute TripForm tripForm, Model model) throws JSONException, IOException {
-        model.addAttribute("tripForm",tripForm);
-        String destination = "Warsaw";
-        List<Day> schedulePlan = scheduleActivitiesService.getActivities(tripForm, destination);
-        model.addAttribute("schedule", schedulePlan);
-        return "schedule-activities";
-    }
-
-    @PostMapping("/schedule")
-    public String getSchedule(Model model) throws IOException, JSONException {
+    public String getSchedule(
+            @RequestParam("source") String source,
+            @RequestParam("destination") String destination,
+            @RequestParam("numberOfTravelers") String numberOfTravelers,
+            @RequestParam("motivation") String motivation,
+            @RequestParam("groupType") String groupType,
+            @RequestParam("startDate") String startDate,
+            @RequestParam("endDate") String endDate,
+            @RequestParam("budgetType") String budgetType,
+            Model model
+    ) throws IOException, JSONException {
         TripForm tripForm = new TripForm();
-        String destination = "Warsaw";
         List<Day> schedulePlan = scheduleActivitiesService.getActivities(tripForm, destination);
         model.addAttribute("destination", destination);
         model.addAttribute("schedule", schedulePlan);
+        model.addAttribute("source", source);
+        model.addAttribute("numberOfTravelers", numberOfTravelers);
+        model.addAttribute("motivation", motivation);
+        model.addAttribute("groupType", groupType);
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
+        model.addAttribute("budgetType", budgetType);
         return "schedule-activities";
     }
 
@@ -52,6 +59,12 @@ public class ScheduleActivitiesController {
     public String loadRoutes(
             @RequestParam("source") String source,
             @RequestParam("destination") String destination,
+            @RequestParam("numberOfTravelers") String numberOfTravelers,
+            @RequestParam("motivation") String motivation,
+            @RequestParam("groupType") String groupType,
+            @RequestParam("startDate") String startDate,
+            @RequestParam("endDate") String endDate,
+            @RequestParam("budgetType") String budgetType,
             Model model
     ) {
         System.out.println("reached");
@@ -61,6 +74,12 @@ public class ScheduleActivitiesController {
             model.addAttribute("source", source);
             model.addAttribute("destination", destination);
             model.addAttribute("routes", routes);
+            model.addAttribute("numberOfTravelers", numberOfTravelers);
+            model.addAttribute("motivation", motivation);
+            model.addAttribute("groupType", groupType);
+            model.addAttribute("startDate", startDate);
+            model.addAttribute("endDate", endDate);
+            model.addAttribute("budgetType", budgetType);
         } catch (IOException | InterruptedException | ApiException e) {
             System.out.println("Error parsing JSON: " + e.getMessage());
             return "error";

@@ -13,10 +13,13 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
         config.enableSimpleBroker("/routes");
+        config.enableSimpleBroker("/destinations");
+        config.enableSimpleBroker("/booking");
+        config.enableSimpleBroker("/schedule");
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/gs-guide-websocket");
+        registry.addEndpoint("/gs-guide-websocket").setAllowedOrigins("*");
     }
 }

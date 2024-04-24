@@ -62,6 +62,7 @@
              }
 
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.0.0/bundles/stomp.umd.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
         $(document).ready(function() {
@@ -69,8 +70,22 @@
                 // No need to prevent the default action or send an AJAX request
             });
         });
+        const stompClient = new StompJs.Client({
+            brokerURL: 'ws://localhost:8087/gs-guide-websocket'
+        });
 
+        // Connect to the WebSocket server
+        stompClient.activate();
 
+        // Callback when connected
+        stompClient.onConnect = (frame) => {
+            console.log('Connected: ' + frame);
+
+            stompClient.subscribe('/routes', (message) => {
+                console.log('Received message:', message.body);
+                document.getElementById("score").innerHTML = message.body;
+            });
+        };
     </script>
 
 
@@ -78,6 +93,7 @@
 <body>
 <div class="form-container" th:class="${destinations == null or destinations.isEmpty()} ? '' : 'hidden'">
     <h2>Plan Your Trip</h2>
+    <div>Score <span id="score" th:text="${rating}"></span></div>
     <form th:action="@{/recommendation-list}" method="post" th:object="${tripForm}">
         <div class="input-field">
             <input type="text" id="homeLocation" name="homeLocation" th:field="*{homeLocation}" />

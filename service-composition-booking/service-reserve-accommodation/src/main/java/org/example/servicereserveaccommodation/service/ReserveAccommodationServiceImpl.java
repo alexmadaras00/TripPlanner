@@ -106,36 +106,18 @@ public class ReserveAccommodationServiceImpl implements ReserveAccommodationServ
         }
 
         Request request = requestBuilder.build();
-        BookingData bookingData = new BookingData();
-        try (Response response = client.newCall(request).execute()) {
-            String responseBody = "";
-            if (response.body() != null && response.code() == 200) {
-                responseBody = response.body().string();
-
-                bookingData = objectMapper.readValue(responseBody, BookingData.class);
-            } else {
-                responseBody = response.body().string();
-                JSONObject jsonObject = new JSONObject(responseBody);
-                JSONArray errors = jsonObject.getJSONArray("errors");
-                for (int i = 0; i < errors.length(); i++) {
-                    JSONObject error = errors.getJSONObject(i);
-                    System.out.println("Error code: " + error.getInt("code"));
-                    System.out.println("Error title: " + error.getString("title"));
-                    System.out.println("Error detail: " + error.getString("detail"));
-                    System.out.println("Error status: " + error.getInt("status"));
-                }
-                ReserveAccommodationController controller = new ReserveAccommodationController();
-                controller.getErrorPage();
-                Booking bookingError = new Booking();
-                List<Booking> errorsData = new ArrayList<>();
-                String errrorDetail = errors.getJSONObject(0).getString("detail")+'\n'+errors.getJSONObject(0).getString("title");
-                bookingError.setType(errrorDetail);
-                errorsData.add(bookingError);
-                bookingData.setData(errorsData);
-            }
-            System.out.println("Response: " + responseBody);
+        BookingData bookingData;
+        Response response = client.newCall(request).execute();
+        String responseBody = response.body().string();
+        System.out.println("Response body: " + responseBody);
+        if (response.body() != null && response.code() == 200) {
+            responseBody = response.body().string();
+            System.out.println("Response body: " + responseBody);
+            bookingData = objectMapper.readValue(responseBody, BookingData.class);
+        } else {
+            bookingData = new BookingData();
         }
-        return bookingData;
+            return bookingData;
     }
 
 }

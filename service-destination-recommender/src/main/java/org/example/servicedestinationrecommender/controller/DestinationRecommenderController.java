@@ -1,26 +1,16 @@
 package org.example.servicedestinationrecommender.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.example.servicedestinationrecommender.data.TripForm;
 import org.example.servicedestinationrecommender.domain.Destination;
 import org.example.servicedestinationrecommender.service.DestinationRecommenderService;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
-
+import org.example.servicedestinationrecommender.data.Trip;
 import java.io.IOException;
 import java.util.List;
 
@@ -65,7 +55,9 @@ public class DestinationRecommenderController {
 
     @PostMapping("/planner/{city:^.*$}")
     public String goToPlannerService(@ModelAttribute("tripForm") TripForm tripForm, @PathVariable(required = false) String city, @RequestParam String country) {
-        return "redirect:http://localhost:8890/planner?source=" + tripForm.getHomeLocation() + "&destination=" + city + "," + country;
+        Trip t = new Trip(tripForm.getHomeLocation(), city + "," + country, tripForm.getNumberOfTravellers(), tripForm.getGroupType().toString(), tripForm.getMotivation().toString(), tripForm.getBudget().toString(), tripForm.getStartDate(), tripForm.getEndDate());
+        destinationRecommenderService.saveTrip(t);
+        return "redirect:http://localhost:8890/planner?source=" + tripForm.getHomeLocation() + "&destination=" + city + "," + country+"&numberOfTravelers="+tripForm.getNumberOfTravellers()+"&motivation="+ tripForm.getMotivation()+"&groupType="+ tripForm.getGroupType()+"&startDate="+ tripForm.getStartDate()+"&endDate="+ tripForm.getEndDate()+"&budgetType="+ tripForm.getBudget();
     }
 
 

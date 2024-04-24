@@ -6,25 +6,22 @@ import org.example.serviceviewaccommodation.services.SelectAccommodationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 public class SelectAccommodationController {
     @Autowired
     SelectAccommodationService selectAccommodationService;
-    @GetMapping("/selectAccommodation")
-    public String getSelectAccommodation(Model model){
-        String hotelId = "MCLONGHM";
-        HotelOfferResponse offer = selectAccommodationService.receiveOffer(hotelId);
+    @GetMapping("/view-accommodation/{hotelID}")
+    public String getSelectAccommodation(@PathVariable String hotelID, Model model){
+        HotelOfferResponse offer = selectAccommodationService.receiveOffer(hotelID);
         model.addAttribute("offers", offer.getData());
         return "show-property";
     }
-    @PostMapping("/selectAccommodation")
-    public String getList(Model model){
-        String hotelId = "MCLONGHM";
-        HotelOfferResponse offer = selectAccommodationService.receiveOffer(hotelId);
-        model.addAttribute("offers", offer.getData());
-        return "show-property";
+    @RequestMapping  ("/book/{offerID}")
+    public String getList(@PathVariable String offerID){
+        System.out.println(offerID);
+        return "redirect:http://localhost:8082/book/"+offerID;
     }
+
 }

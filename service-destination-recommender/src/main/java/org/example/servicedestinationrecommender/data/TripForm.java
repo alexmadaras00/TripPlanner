@@ -32,6 +32,4 @@ public class TripForm {
     private Budget budget;
     @JsonProperty("motivation")
     private Motivation motivation;
-    @JsonProperty("reviews")
-    private List<Review> reviewList;
 }

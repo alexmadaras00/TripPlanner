@@ -1,19 +1,25 @@
 package org.example.servicedestinationrecommender.service;
 
-import okhttp3.*;
+import org.example.servicedestinationrecommender.data.Trip;
 import org.example.servicedestinationrecommender.data.TripForm;
 import org.example.servicedestinationrecommender.domain.Destination;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
+import reactor.core.publisher.Mono;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,6 +27,12 @@ import java.util.regex.Pattern;
 public class DestinationRecommenderServiceImpl implements DestinationRecommenderService {
     @Value("${edenAPI.key}")
     private String apiKey;
+    private final TripRepository tripRepository;
+
+    @Autowired
+    public DestinationRecommenderServiceImpl(TripRepository tripRepository) {
+        this.tripRepository = tripRepository;
+    }
 
     @Override
     public List<Destination> getRecommendations(TripForm tripForm) throws IOException {
@@ -31,38 +43,59 @@ public class DestinationRecommenderServiceImpl implements DestinationRecommender
                 "4. **Group Type**: " + tripForm.getGroupType() + " " +
                 "5. **Budget**: " + tripForm.getBudget() + " " +
                 "6. **Motivation**: " + tripForm.getMotivation() + " " +
-                "7. **Previous Reviews**: " + tripForm.getReviewList() + " " +
                 " " +
                 "Based on this information, recommend top 5 ideal travel destination that aligns with their preferences and interests. Give them a very short answer. Just list the destinations, no more text.";
+
         String url = "https://api.edenai.run/v2/text/chat";
         String generatedText = "";
-        OkHttpClient client = new OkHttpClient.Builder()
-                .connectTimeout(30, TimeUnit.SECONDS) // Set a longer timeout
-                .readTimeout(30, TimeUnit.SECONDS)
-                .writeTimeout(30, TimeUnit.SECONDS)
-                .build();
-        MediaType mediaType = MediaType.parse("application/json");
-        RequestBody body = RequestBody.create("{\"providers\": \"openai\", \"text\": \"" + promptText + "\", \"chatbot_global_action\": \"Act as a seasoned travel advisor assisting a group of enthusiastic travelers.\", \"previous_history\": [], \"temperature\": 0.0, \"max_tokens\": 150, \"fallback_providers\": \"\"}", mediaType);
-        Request request = new Request.Builder()
-                .url("https://api.edenai.run/v2/text/chat")
-                .post(body)
-                .addHeader("accept", "application/json")
-                .addHeader("content-type", "application/json")
-                .addHeader("authorization", "Bearer " + apiKey)
-                .build();
 
-        Response response = client.newCall(request).execute();
-        if (response.body() != null) {
-            String responseBody = response.body().string();
-            System.out.println("Initial response: " + responseBody);
-            JSONObject genTextObject = new JSONObject(responseBody);
-            JSONArray messages = genTextObject.getJSONObject("openai").getJSONArray("message");
-            System.out.println("Message: " + generatedText);
-            generatedText = messages.getJSONObject(1).getString("message");
+        URL apiUrl = new URL(url);
+        HttpURLConnection connection = (HttpURLConnection) apiUrl.openConnection();
+        connection.setRequestMethod("POST");
+        connection.setRequestProperty("accept", "application/json");
+        connection.setRequestProperty("content-type", "application/json");
+        connection.setRequestProperty("authorization", "Bearer " + apiKey);
+        connection.setConnectTimeout(30000); // Set a longer timeout
+        connection.setReadTimeout(30000);
+        connection.setDoOutput(true);
+
+        JSONObject requestBody = new JSONObject();
+        try {
+            requestBody.put("providers", "openai");
+            requestBody.put("text", promptText);
+            requestBody.put("chatbot_global_action", "Act as a seasoned travel advisor assisting a group of enthusiastic travelers.");
+            requestBody.put("previous_history", new JSONArray());
+            requestBody.put("temperature", 0.0);
+            requestBody.put("max_tokens", 150);
+            requestBody.put("fallback_providers", "");
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
-        else{
+
+        try (OutputStream os = connection.getOutputStream()) {
+            byte[] input = requestBody.toString().getBytes("utf-8");
+            os.write(input, 0, input.length);
+        }
+
+        int responseCode = connection.getResponseCode();
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = in.readLine()) != null) {
+                    response.append(line);
+                }
+
+                JSONObject responseObject = new JSONObject(response.toString());
+                JSONArray messages = responseObject.getJSONObject("openai").getJSONArray("message");
+                generatedText = messages.getJSONObject(1).getString("message");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        } else {
             getErrorPage();
         }
+
         return parse(generatedText);
     }
 
@@ -76,6 +109,11 @@ public class DestinationRecommenderServiceImpl implements DestinationRecommender
             destinations.add(new Destination(city, country));
         }
         return destinations;
+    }
+
+    public void saveTrip(Trip trip) {
+        Mono<Trip> t = tripRepository.save(trip);
+        t.subscribe(System.out::println, System.out::println);
     }
 
     @GetMapping("/error")

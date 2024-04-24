@@ -5,8 +5,11 @@
     <title>Booking</title>
 </head>
 <body>
-<form th:action="@{/confirmation}" method="post" th:object="${bookingForm}">
+
+<form th:action="@{'/confirmation/' + ${offerID}}" method="post" th:object="${bookingForm}">
+    <input type="hidden" th:field="*{data.offerId}" th:value="${offerID}" hidden="hidden"/>
     <div th:each="guest, stat : *{data.guests}">
+
         <h3>Guest Details</h3>
         <label>
             <input type="text"  th:field="*{data.guests[__${stat.index}__].name.title}" placeholder="Title" required>
@@ -16,6 +19,7 @@
             <input type="text"  th:field="*{data.guests[__${stat.index}__].contact.email}" placeholder="E-mail" required>
         </label>
     </div>
+
     <div th:each="payment, stat : *{data.payments}">
         <h3>Payment Details</h3>
         <label>
@@ -25,6 +29,7 @@
             <input type="text"  th:field="*{data.payments[__${stat.index}__].card.expiryDate}" placeholder="Expiry Date" required>
         </label>
     </div>
+    <span th:text="${offerID}" hidden="hidden"></span>
     <input type="submit" value="Submit">
 </form>
 </body>

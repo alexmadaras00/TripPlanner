@@ -22,7 +22,7 @@ public class PlanningServiceComposition {
 
     @RequestMapping("/planner")
     public void callRoutesPlanner(@RequestParam("source") String source,
-                                    @RequestParam("destination") String destination, HttpServletResponse httpServletResponse) {
+                                    @RequestParam("destination") String destination,@RequestParam("budgetType") String budgetType, HttpServletResponse httpServletResponse) {
         // Define the URL of the Route Planner Service
         String redirectUrl = "http://localhost:8085/routes?source="+source+"&destination="+destination;
         try {

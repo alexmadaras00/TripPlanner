@@ -18,27 +18,20 @@ import java.util.List;
 public class RecommenderAccommodationController {
     @Autowired
     private RecommenderService recommenderService;
-    @GetMapping("/recommend")
+    @GetMapping("/recommend-accommodation")
     public ModelAndView showInit(Model model, HttpServletRequest request) {
-        String city = "Warsaw";
+        String city = "London";
         String cityCode = recommenderService.getCityCode(city);
         ArrayList<Hotel> hotels = recommenderService.searchHotelsByCityCode(cityCode);
         model.addAttribute("recommendationList", hotels);
         request.getSession().setAttribute("city", city);
+        System.out.println("List: "+recommenderService.searchHotelsByCityCode(cityCode));
         return new ModelAndView("show-recommendations", model.asMap());
     }
-    @SneakyThrows
-    @PostMapping("/recommend")
-    public ModelAndView showRecommendations(@RequestParam("city") String city, Model model, HttpServletRequest request) {
-        String cityCode = recommenderService.getCityCode(city);
-        System.out.println("City code: " + cityCode);
-        model.addAttribute("cityCode", cityCode);
-        model.addAttribute("recommendationList", recommenderService.searchHotelsByCityCode(cityCode));
-        request.getSession().setAttribute("city", city);
-        return new ModelAndView("show-recommendations", model.asMap());
-    }
-    @RequestMapping("/view-accommodation")
-    public String performAction(@ModelAttribute("hotelId") String hotelId ) {
-        return "redirect:http://localhost:8082/view-accommodation?hotelID="+hotelId;
+
+    @RequestMapping("/view-accommodation/{hotelID}")
+    public String performAction(@PathVariable(required = false) String hotelID ) {
+        System.out.println("id: "+hotelID);
+        return "redirect:http://localhost:8082/view-accommodation/"+hotelID;
     }
 }

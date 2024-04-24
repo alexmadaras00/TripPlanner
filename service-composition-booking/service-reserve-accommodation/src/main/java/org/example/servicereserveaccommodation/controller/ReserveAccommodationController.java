@@ -23,7 +23,16 @@ public class ReserveAccommodationController {
     private ReserveAccommodationService reserveAccommodationService;
 
     @GetMapping("/book/{offerID}")
-    public String bookTheAccommodation(@PathVariable String offerID, Model model) {
+    public String bookTheAccommodation(
+            @RequestParam("source") String source,
+            @RequestParam("destination") String destination,
+            @RequestParam("numberOfTravelers") String numberOfTravelers,
+            @RequestParam("motivation") String motivation,
+            @RequestParam("groupType") String groupType,
+            @RequestParam("startDate") String startDate,
+            @RequestParam("endDate") String endDate,
+            @RequestParam("budgetType") String budgetType,
+            @PathVariable String offerID, Model model) {
         BookingForm bookingForm = new BookingForm();
         System.out.println("OFFER ID: " + offerID);
         Data data = new Data();

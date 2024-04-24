@@ -81,7 +81,7 @@ public class BookingServiceComposition {
         model.addAttribute("startDate", startDate);
         model.addAttribute("endDate", endDate);
         model.addAttribute("budgetType", budgetType);
-        System.out.println("composiotion offerID: "+offerID);
+        System.out.println("composition offerID: "+offerID);
         return "booking";
     }
 }

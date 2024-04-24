@@ -36,10 +36,10 @@ public class ReviewController {
     }
 
     @PostMapping(value = "/reviewBefore")
-    public ResponseEntity<String> postReviewBeforePage(
+    public String postReviewBeforePage(
             @RequestBody MultiValueMap<String, String> formData
     ) {
         reviewService.saveBefore(formData);
-        return ResponseEntity.ok("Review submitted successfully");
+        return "redirect:http://localhost:8081/recommendation-list";
     }
 }

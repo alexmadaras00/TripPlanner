@@ -11,6 +11,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.example.servicedestinationrecommender.data.Trip;
+import org.springframework.web.client.RestTemplate;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -19,9 +21,11 @@ import java.util.List;
 public class DestinationRecommenderController {
     @Autowired
     private DestinationRecommenderService destinationRecommenderService;
+    private final RestTemplate restTemplate;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    public DestinationRecommenderController(DestinationRecommenderService destinationRecommenderService) {
+    public DestinationRecommenderController(DestinationRecommenderService destinationRecommenderService, RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
     }
 
     @ModelAttribute("selectedDestination")
@@ -37,16 +41,18 @@ public class DestinationRecommenderController {
 
     @GetMapping("/recommendation-list")
     public String getPageForm(Model model) {
+
         if (!model.containsAttribute("tripForm")) {
             model.addAttribute("tripForm", new TripForm());
         }
+        String responseData = restTemplate.getForObject("http://localhost:8087/rating?column=destinations", String.class);
+        model.addAttribute("rating", responseData);
         return "home";
     }
 
     @PostMapping("/recommendation-list")
     public String getRecommendations(@ModelAttribute("tripForm") TripForm tripForm, Model model) throws IOException {
         List<Destination> destinationList = destinationRecommenderService.getRecommendations(tripForm);
-        System.out.println("GOOOd");
         System.out.println(tripForm);
         System.out.println(tripForm.getNumberOfTravellers());
         model.addAttribute("destinations", destinationList);

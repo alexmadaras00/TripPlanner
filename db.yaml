@@ -1,0 +1,136 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-config
+  labels:
+    app: postgres
+data:
+  Postgres_DB: postgresdb
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres-secret
+data:
+  Postgres_User: cG9zdGdyZXNhZG1pbg==
+  Postgres_Password: YWRtaW4xMjM=
+
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: postgres-pv-volume
+  labels:
+    type: local
+    app: postgres
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/mnt/data"
+
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: postgres-pv-claim
+  labels:
+    app: postgres
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 5Gi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres-container
+          image: postgres:latest
+          imagePullPolicy: "IfNotPresent"
+          lifecycle:
+            postStart:
+              exec:
+                command: ["/bin/sh","-c","sleep 20 
+                  && createdb -U postgresadmin -W users
+                  && createdb -U postgresadmin -W reviews 
+                  && createdb -U postgresadmin -W trips 
+                  && createdb -U postgresadmin -W booking 
+                  && PGPASSWORD=$POSTGRES_PASSWORD psql -w -d users -U $POSTGRES_USER -c 'CREATE TABLE users (
+                   id TEXT PRIMARY KEY,
+                   username VARCHAR(255),
+                   password VARCHAR(255)
+                  );' && sleep 20
+                  && PGPASSWORD=$POSTGRES_PASSWORD psql -w -d reviews -U $POSTGRES_USER -c 'CREATE TABLE reviews (
+                    id SERIAL PRIMARY KEY,
+                    booking_id INT,
+                    trip_id INT,
+                    destination_rating INT,
+                    route_rating INT,
+                    schedule_rating INT,
+                    booking_rating INT
+                  );' && sleep 20
+                  && PGPASSWORD=$POSTGRES_PASSWORD psql -w -d trips -U $POSTGRES_USER -c 'CREATE TABLE trips (
+                    id SERIAL PRIMARY KEY,
+                    home_location VARCHAR(255),
+                    destination VARCHAR(255),
+                    start_date TEXT,
+                    end_date TEXT,
+                    number_of_travellers INT,
+                    group_type VARCHAR(255),
+                    budget TEXT,
+                    motivation TEXT
+                  );' && sleep 20
+                  && PGPASSWORD=$POSTGRES_PASSWORD psql -w -d booking -U $POSTGRES_USER -c 'CREATE TABLE booking (
+                    id SERIAL PRIMARY KEY,
+                    hotel_name VARCHAR(255),
+                    city VARCHAR(255),
+                    price INT,
+                    num_people INT,
+                    check_in DATE,
+                    check_out DATE
+                  );' && sleep 20
+                "]
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-config
+                  key: Postgres_DB
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: Postgres_User
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: Postgres_Password
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgredb
+      volumes:
+        - name: postgredb
+          persistentVolumeClaim:
+            claimName: postgres-pv-claim

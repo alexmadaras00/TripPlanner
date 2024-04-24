@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres-secret
+data:
+  Postgres_User: cG9zdGdyZXNhZG1pbg==
+  Postgres_Password: YWRtaW4xMjM=
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-reviews
+  labels:
+    app: soa
+spec:
+  ports:
+    - port: 8087
+  type: LoadBalancer
+  selector:
+    app: soa
+    tier: service-reviews
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: service-reviews
+  labels:
+    app: soa
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: soa
+      tier: service-reviews
+  template:
+    metadata:
+      labels:
+        app: soa
+        tier: service-reviews
+    spec:
+      containers:
+        - name: service-reviews
+          image: trip/service-reviews
+          ports:
+            - containerPort: 8087
+              name: service-reviews
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://localhost:5432/reviews
+            - name: SPRING_DATASOURCE_USERNAME
+              value: postgresadmin
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: admin123
+            - name: SPRING_JPA_HIBERNATE_DDL_AUTO
+              value: update
+            - name: SPRING_SQL_INIT_MODE
+              value: always
+          imagePullPolicy: Never

@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-find
+  labels:
+    app: soa
+spec:
+  ports:
+    - port: 8081
+  type: LoadBalancer
+  selector:
+    app: soa
+    tier: service-find
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: service-find
+  labels:
+    app: soa
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: soa
+      tier: service-find
+  template:
+    metadata:
+      labels:
+        app: soa
+        tier: service-find
+    spec:
+      containers:
+        - name: service-find
+          image: trip/service-find
+          ports:
+            - containerPort: 8081
+              name: service-find
+          imagePullPolicy: Never

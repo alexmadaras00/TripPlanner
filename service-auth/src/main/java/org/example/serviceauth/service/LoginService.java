@@ -6,9 +6,11 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import org.example.serviceauth.data.User;
 import org.example.serviceauth.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.mindrot.jbcrypt.BCrypt;
 import reactor.core.publisher.Mono;
@@ -18,56 +20,57 @@ import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
 import java.util.Date;
 
-
 @Service
 public class LoginService {
-
-    private static final byte[] SECRET_KEY = "VatjGhXrwQzdPCulVZx8bjdInu4U4TAlTtKgBS6xDFrjmRAlNILFctMAxktWimUc".getBytes(); // Change this to your secret key as byte array
+    @Value("${spring.secretKey}")
+    private String secretKey;
+    private static byte[] SECRET_KEY;
     private static final long EXPIRATION_TIME = 86400000; // 24 hours in milliseconds
-
-
 
     @Autowired
     private final UserRepository userRepository;
 
+    @Autowired
     public LoginService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
+    @PostConstruct
+    public void init() {
+        SECRET_KEY = secretKey.getBytes();
+    }
+
     public static String hashPassword(String password) {
-        String salt = BCrypt.gensalt();
+        String salt = BCrypt.gensalt(12); // You can specify the log rounds (e.g., 12)
         return BCrypt.hashpw(password, salt);
     }
 
+
     public static boolean checkPassword(String providedPassword, String storedHash) {
-        // Use BCrypt to verify the password
         return BCrypt.checkpw(providedPassword, storedHash);
     }
 
-    public boolean saveUser(User user) {
-        User existingUser = userRepository.findByUsername(user.getUsername()).block();
-        if (existingUser != null) {
-            return false;
-        }
+    public Mono<Boolean> saveUser(User user) {
+        // Hash the password before saving
         user.setPassword(hashPassword(user.getPassword()));
-        Mono<User> ur = userRepository.save(user);
-        ur.subscribe(savedUser -> {}, error -> {});
-        return true;
+        return userRepository.findByUsername(user.getUsername())
+                .flatMap(existingUser -> Mono.just(false))
+                .switchIfEmpty(userRepository.save(user).then(Mono.just(true)));
     }
 
-    public String checkUser(String username, String password) throws Exception {
-        User existingUser = userRepository.findByUsername(username).block();
-        if (existingUser == null) {
-            throw new Exception("No Such User");
-        }
-        boolean verifiedUser = checkPassword(password, existingUser.getPassword());
-        if (!verifiedUser) {
-            throw new Exception("Wrong Password");
-        }
-        return generateToken(existingUser.getId());
+    public Mono<String> checkUser(String username, String password) {
+        return userRepository.findByUsername(username)
+                .flatMap(existingUser -> {
+                    if (checkPassword(password, existingUser.getPassword())) {
+                        return Mono.just(generateToken(existingUser.getId()));
+                    } else {
+                        return Mono.error(new Exception("Wrong Password"));
+                    }
+                })
+                .switchIfEmpty(Mono.error(new Exception("No Such User")));
     }
 
-    public static String generateToken(String username) {
+    public String generateToken(String username) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + EXPIRATION_TIME);
 
@@ -80,6 +83,7 @@ public class LoginService {
                 .signWith(key)
                 .compact();
     }
+
     public static String getUsernameFromToken(String token) {
         SecretKey key = Keys.hmacShaKeyFor(SECRET_KEY);
         Jws<Claims> claims = Jwts.parserBuilder()
@@ -88,6 +92,4 @@ public class LoginService {
                 .parseClaimsJws(token);
         return claims.getBody().getSubject();
     }
-
 }
-

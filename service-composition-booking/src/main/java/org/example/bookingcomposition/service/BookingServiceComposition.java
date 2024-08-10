@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Controller
 public class BookingServiceComposition {
-    String serviceRecommendAccommodationUrl = "http://localhost:8084/recommend-accommodation";
+    String serviceRecommendAccommodationUrl = "http://localhost:8099/recommend-accommodation";
     String serviceViewAccommodationOffersUrl = "http://localhost:8086/view-accommodation";
     String serviceBookAccommodationUrl = "http://localhost:8085/book";
 

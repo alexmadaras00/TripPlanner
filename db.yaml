@@ -5,7 +5,7 @@ metadata:
   labels:
     app: postgres
 data:
-  Postgres_DB: postgresdb
+  Postgres_DB: "postgresdb"
 ---
 apiVersion: v1
 kind: Secret

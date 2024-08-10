@@ -30,10 +30,10 @@ public class ReviewController {
         return "reviewBefore";
     }
 
-    @GetMapping("/rating")
-    public  ResponseEntity<String> getRating(@RequestParam(name = "column") String column) {
-        return  ResponseEntity.ok(String.format("%.2f", reviewService.average(column)));
-    }
+//    @GetMapping("/rating")
+//    public  ResponseEntity<String> getRating(@RequestParam(name = "column") String column) {
+//       // return  ResponseEntity.ok(String.format("%.2f", reviewService.average(column)));
+//    }
 
     @PostMapping(value = "/reviewBefore")
     public String postReviewBeforePage(

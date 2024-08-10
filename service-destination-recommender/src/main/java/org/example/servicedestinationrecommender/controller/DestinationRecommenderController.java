@@ -45,8 +45,11 @@ public class DestinationRecommenderController {
         if (!model.containsAttribute("tripForm")) {
             model.addAttribute("tripForm", new TripForm());
         }
-        String responseData = restTemplate.getForObject("http://localhost:8087/rating?column=destinations", String.class);
-        model.addAttribute("rating", responseData);
+//        if(restTemplate.getForObject("http://localhost:8087/rating?column=destinations", String.class)!=null) {
+//            String responseData = restTemplate.getForObject("http://localhost:8087/rating?column=destinations", String.class);
+//            model.addAttribute("rating", responseData);
+//        }
+
         return "home";
     }
 
@@ -55,6 +58,7 @@ public class DestinationRecommenderController {
         List<Destination> destinationList = destinationRecommenderService.getRecommendations(tripForm);
         System.out.println(tripForm);
         System.out.println(tripForm.getNumberOfTravellers());
+
         model.addAttribute("destinations", destinationList);
         return "home";
     }

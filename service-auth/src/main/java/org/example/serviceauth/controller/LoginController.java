@@ -24,7 +24,7 @@ public class LoginController {
     @PostMapping("/login")
     public ModelAndView login(@RequestParam("username") String username, @RequestParam("password") String password) {
         try {
-            String jwt = loginService.checkUser(username, password);
+            String jwt = String.valueOf(loginService.checkUser(username, password));
             ModelAndView modelAndView = new ModelAndView("redirect:http://localhost:8081/recommendation-list");
             modelAndView.addObject("jwt", jwt);
             return modelAndView;

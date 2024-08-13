@@ -50,12 +50,12 @@ public class LoginService {
         return BCrypt.checkpw(providedPassword, storedHash);
     }
 
-    public Mono<Boolean> saveUser(User user) {
+    public boolean saveUser(User user) {
         // Hash the password before saving
         user.setPassword(hashPassword(user.getPassword()));
-        return userRepository.findByUsername(user.getUsername())
+        return Boolean.TRUE.equals(userRepository.findByUsername(user.getUsername())
                 .flatMap(existingUser -> Mono.just(false))
-                .switchIfEmpty(userRepository.save(user).then(Mono.just(true)));
+                .switchIfEmpty(userRepository.save(user).then(Mono.just(true))).block());
     }
 
     public Mono<String> checkUser(String username, String password) {

@@ -1,16 +1,18 @@
 package org.example.finddestinationservice.service;
 
 import okhttp3.*;
-import org.example.finddestinationservice.controller.ScheduleActivitiesController;
 import org.example.finddestinationservice.data.Activity;
 import org.example.finddestinationservice.data.Day;
 import org.example.finddestinationservice.data.Schedule;
 import org.example.finddestinationservice.data.TripForm;
+import org.example.finddestinationservice.repository.TripRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.configurationprocessor.json.JSONArray;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,7 +24,8 @@ public class ScheduleActivitiesServiceImpl implements ScheduleActivitiesService 
 
     @Value("${edenAPI.key}")
     private String apiKey;
-    private ScheduleActivitiesController controller;
+    @Autowired
+    private TripRepository tripRepository;
     @Override
     public List<Day> getActivities(TripForm tripForm, String destination) throws IOException, JSONException {
         String promptText = "You are an AI travel advisor assisting a group of " + tripForm.getNumberOfTravellers() + " friends who are planning a trip to " + destination + " from " + tripForm.getStartDate() + " to " + tripForm.getEndDate() + ". " +
@@ -88,4 +91,16 @@ public class ScheduleActivitiesServiceImpl implements ScheduleActivitiesService 
                 return null;
             }
         }
+    public Mono<TripForm> saveTrip(TripForm trip) {
+        return tripRepository.save(trip);
+    }
+
+    public Mono<TripForm> getTrip(String id) {
+        return tripRepository.findById(id);
+    }
+
+    public Mono<Void> deleteTrip(String id) {
+        return tripRepository.deleteById(id);
+    }
 }
+

@@ -1,8 +1,8 @@
 package org.example.servicedestinationrecommender.service;
 
-import org.example.servicedestinationrecommender.data.Trip;
 import org.example.servicedestinationrecommender.data.TripForm;
 import org.example.servicedestinationrecommender.domain.Destination;
+import org.example.servicedestinationrecommender.repository.TripRepository;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,7 +27,8 @@ import java.util.regex.Pattern;
 public class DestinationRecommenderServiceImpl implements DestinationRecommenderService {
     @Value("${edenAPI.key}")
     private String apiKey;
-    private final TripRepository tripRepository;
+    @Autowired
+    private TripRepository tripRepository;
 
     @Autowired
     public DestinationRecommenderServiceImpl(TripRepository tripRepository) {
@@ -111,8 +112,8 @@ public class DestinationRecommenderServiceImpl implements DestinationRecommender
         return destinations;
     }
 
-    public void saveTrip(Trip trip) {
-        Mono<Trip> t = tripRepository.save(trip);
+    public void saveTrip(TripForm trip) {
+        Mono<TripForm> t = tripRepository.save(trip);
         t.subscribe(System.out::println, System.out::println);
     }
 

@@ -45,7 +45,6 @@ public class LoginService {
         return BCrypt.hashpw(password, salt);
     }
 
-
     public static boolean checkPassword(String providedPassword, String storedHash) {
         return BCrypt.checkpw(providedPassword, storedHash);
     }
@@ -62,7 +61,7 @@ public class LoginService {
         return userRepository.findByUsername(username)
                 .flatMap(existingUser -> {
                     if (checkPassword(password, existingUser.getPassword())) {
-                        return Mono.just(generateToken(existingUser.getId()));
+                        return Mono.just(generateToken(existingUser.getUserId()));
                     } else {
                         return Mono.error(new Exception("Wrong Password"));
                     }
@@ -76,12 +75,15 @@ public class LoginService {
 
         Key key = new SecretKeySpec(SECRET_KEY, SignatureAlgorithm.HS512.getJcaName());
 
-        return Jwts.builder()
+        String token = Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .signWith(key)
                 .compact();
+        System.out.println("Generated Token: " + token);
+        return token;
+
     }
 
     public static String getUsernameFromToken(String token) {

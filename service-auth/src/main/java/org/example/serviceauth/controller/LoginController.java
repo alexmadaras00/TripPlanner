@@ -6,8 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import reactor.core.publisher.Mono;
 
 import java.util.Map;
 
@@ -23,16 +27,17 @@ public class LoginController {
 
     @PostMapping("/login")
     public ModelAndView login(@RequestParam("username") String username, @RequestParam("password") String password) {
-        try {
-            String jwt = String.valueOf(loginService.checkUser(username, password));
-            ModelAndView modelAndView = new ModelAndView("redirect:http://localhost:8081/recommendation-list");
-            modelAndView.addObject("jwt", jwt);
-            return modelAndView;
-        } catch (Exception e) {
-            ModelAndView modelAndView = new ModelAndView("login");
-            modelAndView.addObject("error", e.getMessage());
-            return modelAndView;
-        }
+        return loginService.checkUser(username, password)
+                .map(jwt -> {
+                    ModelAndView modelAndView = new ModelAndView("redirect:http://localhost:8081/recommendation-list");
+                    modelAndView.addObject("jwt", jwt);
+                    return modelAndView;
+                })
+                .onErrorResume(e -> {
+                    ModelAndView modelAndView = new ModelAndView("login");
+                    modelAndView.addObject("error", e.getMessage());
+                    return Mono.just(modelAndView);
+                }).block();
     }
 
     @GetMapping("/signup")

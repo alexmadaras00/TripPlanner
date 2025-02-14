@@ -1,7 +1,7 @@
 package org.example.finddestinationservice.controller;
 
 import com.google.maps.errors.ApiException;
-import lombok.Getter;
+import jakarta.servlet.http.HttpServletRequest;
 import org.example.finddestinationservice.data.Day;
 import org.example.finddestinationservice.data.Route;
 import org.example.finddestinationservice.data.TripForm;
@@ -11,18 +11,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.stereotype.Controller;
-import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
 import java.util.List;
 
 @Controller
-public class ScheduleActivitiesController {
+public class FindDestinationController {
     @Value("${google.directionsAPI.key}")
     private String googleMapsApiKey;
     @Autowired
@@ -39,10 +36,12 @@ public class ScheduleActivitiesController {
             @RequestParam("startDate") String startDate,
             @RequestParam("endDate") String endDate,
             @RequestParam("budgetType") String budgetType,
-            Model model
+            Model model,
+            HttpServletRequest request
     ) throws IOException, JSONException {
         TripForm tripForm = new TripForm();
         List<Day> schedulePlan = scheduleActivitiesService.getActivities(tripForm, destination);
+        routePlannerService.saveTrip(tripForm);
         model.addAttribute("destination", destination);
         model.addAttribute("schedule", schedulePlan);
         model.addAttribute("source", source);
@@ -54,7 +53,6 @@ public class ScheduleActivitiesController {
         model.addAttribute("budgetType", budgetType);
         return "schedule-activities";
     }
-
     @GetMapping("/routes")
     public String loadRoutes(
             @RequestParam("source") String source,
@@ -86,4 +84,5 @@ public class ScheduleActivitiesController {
         }
         return "routes";
     }
+
 }

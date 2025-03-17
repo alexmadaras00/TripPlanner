@@ -2,20 +2,18 @@ package org.example.serviceauth.service;
 
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import org.example.serviceauth.data.User;
 import org.example.serviceauth.repository.UserRepository;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.mindrot.jbcrypt.BCrypt;
 import reactor.core.publisher.Mono;
 
-import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
 import java.util.Date;
@@ -24,8 +22,12 @@ import java.util.Date;
 public class LoginService {
     @Value("${spring.secretKey}")
     private String secretKey;
-    private static byte[] SECRET_KEY;
-    private static final long EXPIRATION_TIME = 86400000; // 24 hours in milliseconds
+    private byte[] SECRET_KEY; // 24 hours in milliseconds
+    @Value("${jwt.access-token-expiration}")
+    private long accessTokenExpiration;
+
+    @Value("${jwt.refresh-token-expiration}")
+    private long refreshTokenExpiration;
 
     @Autowired
     private final UserRepository userRepository;
@@ -71,7 +73,7 @@ public class LoginService {
 
     public String generateToken(String username) {
         Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + EXPIRATION_TIME);
+        Date expiryDate = new Date(now.getTime() + accessTokenExpiration);
 
         Key key = new SecretKeySpec(SECRET_KEY, SignatureAlgorithm.HS512.getJcaName());
 
@@ -83,15 +85,61 @@ public class LoginService {
                 .compact();
         System.out.println("Generated Token: " + token);
         return token;
-
+    }
+    public String refreshToken(String refreshToken){
+        if(validateRefreshToken(refreshToken)){
+            return generateNewAccessToken(refreshToken);
+        }else{
+            throw new RuntimeException("Invalid Refresh Token");
+        }
     }
 
-    public static String getUsernameFromToken(String token) {
-        SecretKey key = Keys.hmacShaKeyFor(SECRET_KEY);
-        Jws<Claims> claims = Jwts.parserBuilder()
-                .setSigningKey(key)
+    private String generateNewAccessToken(String refreshToken) {
+        String username = getUsernameFromToken(refreshToken);
+        return Jwts.builder()
+                .setSubject(username)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + accessTokenExpiration))
+                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .compact();
+    }
+    public String generateNewRefreshToken() {
+        return Jwts.builder()
+                .setSubject("username") // Usually taken from an existing session or user info
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + refreshTokenExpiration))
+                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .compact();
+    }
+    public String getUsernameFromRefreshToken(String refreshToken) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(secretKey)
                 .build()
-                .parseClaimsJws(token);
-        return claims.getBody().getSubject();
+                .parseClaimsJws(refreshToken)
+                .getBody();
+        return claims.getSubject();
     }
+
+    public boolean validateRefreshToken(String refreshToken) {
+        // Add validation logic for the refresh token (check expiration, signature, etc.)
+        try {
+            Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(refreshToken);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+    public String getUsernameFromToken(String token) {
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(secretKey.getBytes())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+            return claims.getSubject();  // Assuming username is stored as subject
+        } catch (JwtException e) {
+            throw new RuntimeException("Invalid token", e);  // More specific error handling
+        }
+    }
+
 }

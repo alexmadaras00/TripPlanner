@@ -71,6 +71,8 @@
             <label for="password">Password:</label>
             <input type="password" id="password" name="password" required>
         </div>
+        <input type="hidden" name="jwt" id="jwt" th:value="${jwt}">
+        <p>JWT Debug: <span th:text="${jwt != null ? jwt : 'JWT NOT FOUND'}"></span></p>
         <div class="form-group">
             <input type="submit" value="Login">
         </div>

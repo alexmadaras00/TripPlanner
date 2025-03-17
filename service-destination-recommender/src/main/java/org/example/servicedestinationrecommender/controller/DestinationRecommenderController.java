@@ -25,7 +25,10 @@ public class DestinationRecommenderController {
     private DestinationRecommenderService destinationRecommenderService;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     @Value("${edenAPI.key}")
-    private String secretKey;
+    private String edenAPIKey;
+    @Value("${spring.secretKey}")
+    private String springSecretKey;
+
 
     public DestinationRecommenderController(DestinationRecommenderService destinationRecommenderService, RestTemplate restTemplate) {
     }
@@ -41,11 +44,18 @@ public class DestinationRecommenderController {
     }
 
     @GetMapping("/recommendation-list")
-    public String getPageForm(Model model) {
+    public String getPageForm(@RequestParam(value = "jwt", required = false) String jwt, Model model) {
 
         if (!model.containsAttribute("tripForm")) {
             model.addAttribute("tripForm", new TripForm());
         }
+        if (jwt == null || jwt.isEmpty()) {
+            model.addAttribute("error", "JWT NOT FOUND");
+            return "login"; // Redirect or show error
+        }
+
+        model.addAttribute("jwt", jwt);
+
 //        if(restTemplate.getForObject("http://localhost:8087/rating?column=destinations", String.class)!=null) {
 //            String responseData = restTemplate.getForObject("http://localhost:8087/rating?column=destinations", String.class);
 //            model.addAttribute("rating", responseData);
@@ -56,6 +66,7 @@ public class DestinationRecommenderController {
 
     @PostMapping("/recommendation-list")
     public String getRecommendations(@ModelAttribute("tripForm") TripForm tripForm, @RequestParam("jwt") String jwt, Model model) throws IOException {
+        System.out.println(jwt);
         if (jwt == null || jwt.equals("${jwt}")) {
             logger.error("Invalid JWT received: {}", jwt);
             throw new RuntimeException("Invalid JWT received");
@@ -73,21 +84,20 @@ public class DestinationRecommenderController {
 
     @PostMapping("/planner/{city:^.*$}")
     public String goToPlannerService(@ModelAttribute("tripForm") TripForm tripForm, @ModelAttribute("user_id") int userId, @PathVariable(required = false) String city, @RequestParam String country) {
-        Trip t = new Trip(tripForm.getHomeLocation(), city + "," + country, tripForm.getNumberOfTravellers(), tripForm.getGroupType().toString(), tripForm.getMotivation().toString(), tripForm.getBudget().toString(), tripForm.getStartDate(), tripForm.getEndDate());
+        Trip trip = new Trip(tripForm.getHomeLocation(), city + "," + country, tripForm.getNumberOfTravellers(), tripForm.getGroupType().toString(), tripForm.getMotivation().toString(), tripForm.getBudget().toString(), tripForm.getStartDate(), tripForm.getEndDate());
         destinationRecommenderService.saveTrip(tripForm);
+        System.out.println(userId);
         tripForm.setUserid(String.valueOf(userId));
-        System.out.println("Selected destination");
         return "redirect:http://localhost:8082/routes?source=" + tripForm.getHomeLocation() + "&destination=" + city + "," + country+"&numberOfTravelers="+tripForm.getNumberOfTravellers()+"&motivation="+ tripForm.getMotivation()+"&groupType="+ tripForm.getGroupType()+"&startDate="+ tripForm.getStartDate()+"&endDate="+ tripForm.getEndDate()+"&budgetType="+ tripForm.getBudget();
     }
     private int getUserIdFromJwt(String jwt) {
         System.out.println("JWT key: "+jwt);
         Claims claims = Jwts.parserBuilder()
-                .setSigningKey(secretKey.getBytes())
+                .setSigningKey(springSecretKey.getBytes())
                 .build()
                 .parseClaimsJws(jwt)
                 .getBody();
-        System.out.println("User ID: "+ claims.get("user_id"));
-        return (int) claims.get("user_id");
-    }
 
+        return Integer.parseInt(claims.get("sub", String.class));
+    }
 }

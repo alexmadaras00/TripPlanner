@@ -95,7 +95,7 @@
     <h2>Plan Your Trip</h2>
     <div>Score <span id="score" th:text="${rating}"></span></div>
     <form th:action="@{/recommendation-list}" method="post" th:object="${tripForm}">
-        <input type="hidden" name="jwt" value="${jwt}" />
+        <input type="hidden" name="jwt" th:value="${jwt}" />
         <div class="input-field">
             <input type="text" id="homeLocation" name="homeLocation" th:field="*{homeLocation}" />
             <label for="homeLocation">Home Location:</label>

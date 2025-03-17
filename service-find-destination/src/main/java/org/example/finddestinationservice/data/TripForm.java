@@ -40,4 +40,5 @@ public class TripForm {
     private List<Review> reviewList;
     @JsonProperty("transportation_mean")
     private String transportatonMean;
+
 }

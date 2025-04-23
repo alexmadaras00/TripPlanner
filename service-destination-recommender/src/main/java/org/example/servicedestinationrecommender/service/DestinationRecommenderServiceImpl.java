@@ -86,7 +86,6 @@ public class DestinationRecommenderServiceImpl implements DestinationRecommender
                 while ((line = in.readLine()) != null) {
                     response.append(line);
                 }
-
                 JSONObject responseObject = new JSONObject(response.toString());
                 JSONArray messages = responseObject.getJSONObject("openai").getJSONArray("message");
                 generatedText = messages.getJSONObject(1).getString("message");
@@ -96,7 +95,6 @@ public class DestinationRecommenderServiceImpl implements DestinationRecommender
         } else {
             getErrorPage();
         }
-
         return parse(generatedText);
     }
 

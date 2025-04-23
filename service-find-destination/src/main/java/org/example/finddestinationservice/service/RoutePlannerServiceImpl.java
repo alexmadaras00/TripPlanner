@@ -23,7 +23,7 @@ import java.util.List;
 public class RoutePlannerServiceImpl implements RoutePlannerService {
 
     @Value("${google.directionsAPI.key}")
-    private String apiKey;
+    private String googleMapsApiKey;
 
     @Autowired
     private TripRepository tripRepository;
@@ -32,14 +32,13 @@ public class RoutePlannerServiceImpl implements RoutePlannerService {
         String url = "https://maps.googleapis.com/maps/api/directions/" + "origin= " + start + "&destination=" + destination;
 
         GeoApiContext context = new GeoApiContext.Builder()
-                .apiKey(apiKey)
+                .apiKey(googleMapsApiKey)
                 .build();
         DirectionsResult result = DirectionsApi.newRequest(context)
                 .origin(start)
                 .destination(destination)
                 .await();
         List<Route> routes = new ArrayList<>();
-
         System.out.println(start);
         System.out.println(destination);
         System.out.println(Arrays.toString(result.routes));

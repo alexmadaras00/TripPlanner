@@ -6,6 +6,7 @@ import org.example.finddestinationservice.data.Day;
 import org.example.finddestinationservice.data.Schedule;
 import org.example.finddestinationservice.data.TripForm;
 import org.example.finddestinationservice.repository.TripRepository;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.configurationprocessor.json.JSONArray;
@@ -72,15 +73,7 @@ public class ScheduleActivitiesServiceImpl implements ScheduleActivitiesService 
                 for (String line : lines) {
                     Day day = new Day();
                     day.setNumber(dayNumber++);
-                    String[] activities = line.split(", ");
-                    List<Activity> activityList = new ArrayList<>();
-                    for (String activityName : activities) {
-                        Activity activity = new Activity();
-                        activity.setName(activityName);
-                        // Assuming startTime is not provided in the response
-                        activity.setStartTime(""); // You can set this if needed
-                        activityList.add(activity);
-                    }
+                    List<Activity> activityList = getActivities(line);
                     day.setActivityList(activityList);
                     days.add(day);
                 }
@@ -91,6 +84,21 @@ public class ScheduleActivitiesServiceImpl implements ScheduleActivitiesService 
                 return null;
             }
         }
+
+    @NotNull
+    private static List<Activity> getActivities(String line) {
+        String[] activities = line.split(", ");
+        List<Activity> activityList = new ArrayList<>();
+        for (String activityName : activities) {
+            Activity activity = new Activity();
+            activity.setName(activityName);
+            // Assuming startTime is not provided in the response
+            activity.setStartTime(""); // You can set this if needed
+            activityList.add(activity);
+        }
+        return activityList;
+    }
+
     public Mono<TripForm> saveTrip(TripForm trip) {
         return tripRepository.save(trip);
     }

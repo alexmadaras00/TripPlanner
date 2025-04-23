@@ -1,221 +1,37 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
 <head>
-    <title>Add Map</title>
-    <style>
-        .select-button {
-            background-color: #007bff;
-            align-self: center;
-            justify-content: center;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            display: block; /* Make the button a block element */
-            margin-top: 10px; /* Add some spacing between text and button */
-        }
-    </style>
-    <script>
-        if (!localStorage.getItem('formSubmitted')) {
-            document.addEventListener("DOMContentLoaded", function () {
-                setTimeout(function () {
-                    var form = document.getElementById("myForm");
-                    var xhr = new XMLHttpRequest();
-                    xhr.open(form.method, form.action);
-                    xhr.onreadystatechange = function() {
-                        if (xhr.readyState === 4 && xhr.status === 200) {
-                            localStorage.setItem('formSubmitted', 'true');
-                        }
-                    };
-                    xhr.send(new FormData(form));
-                }, 5000);  // Delay of 5 seconds
-            });
-        }
+    <title>Directions</title>
+    <link rel="stylesheet" type="text/css" th:href="@{./css/style.css}"/>
+    <script th:inline="javascript">
+        // Make sure to replace this line with your server-side templating language to pass the API key
+        var googleMapsApiKey = '${googleMapsApiKey}';
     </script>
-    <script>(g => {
-        let h, a, k, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary", q = "__ib__",
-            m = document,
-            b = window;
-        b = b[c] || (b[c] = {});
-        const d = b.maps || (b.maps = {}), r = new Set, e = new URLSearchParams,
-            u = () => h || (h = new Promise(async (f, n) => {
-                await (a = m.createElement("script"));
-                e.set("libraries", [...r] + "");
-                for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]);
-                e.set("callback", c + ".maps." + q);
-                a.src = `https://maps.${c}apis.com/maps/api/js?` + e;
-                d[q] = f;
-                a.onerror = () => h = n(Error(p + " could not load."));
-                a.nonce = m.querySelector("script[nonce]")?.nonce || "";
-                m.head.append(a)
-            }));
-        d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n))
-    })
-    ({key: "AIzaSyDxS3k5ix72NvCWTjYVj5wnQCdJ3Y3O4no", v: "weekly"});</script>
-    <!--    <script type="module" th:src="@{/script/initializeMap.js}"></script>-->
-    <script>
-        var routeDisplay = new function () {
-            var self = this;
-            // Variables
-            self.directionsService;
-            self.directionsRenderer;
-            self.map;
-            self.origin;
-            self.destination;
-
-            // Functions
-            self.setup = function () {
-                self.directionsService = new google.maps.DirectionsService();
-                self.directionsRenderer = new google.maps.DirectionsRenderer({
-                    preserveViewport: true,
-                    suppressMarkers: true
-                });
-            }
-
-            self.setMap = function (map) {
-                self.map = map;
-                self.directionsRenderer.setMap(map);
-            }
-
-            self.setPoints = function (origin, destination) {
-                self.origin = origin;
-                self.destination = destination;
-            }
-
-            self.render = function () {
-                self.setup()
-                if (self.directionsRenderer.getMap() == null)
-                    self.directionsRenderer.setMap(self.map);
-
-                self.directionsService.route({
-                    origin: self.origin,
-                    destination: self.destination,
-                    travelMode: 'DRIVING'
-                }, function (response, status) {
-                    if (status === 'OK') {
-                        self.directionsRenderer.setDirections(response);
-                        // Calculate bounds of the route
-                        var bounds = new google.maps.LatLngBounds();
-                        var route = response.routes[0].overview_path;
-                        route.forEach(function (point) {
-                            bounds.extend(point);
-                        });
-                        // Adjust map's zoom level to fit the route
-                        self.map.fitBounds(bounds);
-                    } else {
-                        window.alert('Directions request failed due to ' + status);
-                    }
-                });
-            }
-
-            self.hide = function () {
-                self.directionsRenderer.setMap(null);
-            }
-
-            self.show = function () {
-                self.directionsRenderer.setMap(self.map);
-            }
-
-            self.toggleShow = function () {
-                self.directionsRenderer.map = (self.directionsRenderer.getMap() == null) ?
-                    self.map : null;
-            }
-
-            self.isAlreadyRendered = function (origin, destination) {
-                if (origin == self.origin && destination == self.destination) return true;
-                return false;
-            }
-        }
-
-        async function initMap(source, destination) {
-            console.log(source, destination);
-
-            const {Map} = await google.maps.importLibrary("maps");
-            var myLatLang = {"lat": 52.21833, "lng": 6.89583}
-            var options = {
-                center: myLatLang,
-                zoom: 7,
-                mapTypeId: google.maps.MapTypeId.ROADMAP
-            };
-            var map = new google.maps.Map(document.getElementById("map"), options);
-
-
-            var directionsService = new google.maps.DirectionsService();
-            var directionsDisplay = new google.maps.DirectionsRenderer();
-            directionsDisplay.setMap(map);
-
-            try {
-                const response = await directionsService.route({
-                    origin: {query: source},
-                    destination: {query: destination},
-                    travelMode: google.maps.TravelMode.DRIVING,
-                });
-                const {startLL, endLL} = getData(response["routes"][0]["legs"][0]["steps"])
-
-                var start = new google.maps.Marker({
-                    position: startLL,
-                    map: map,
-                });
-
-                var end = new google.maps.Marker({
-                    position: endLL,
-                    map: map,
-                });
-
-                routeDisplay.setup();
-                routeDisplay.setMap(map);
-
-                var a = start.position;
-                var b = end.position;
-                if (routeDisplay.isAlreadyRendered(a, b)) routeDisplay.toggleShow();
-                else {
-                    routeDisplay.setPoints(a, b);
-                    routeDisplay.render();
-                }
-            } catch (error) {
-                console.error('Error getting directions:', error);
-            }
-        }
-
-        function getData(obj) {
-            const start_location = obj[0]["start_location"];
-            const end_location = obj.at(-1)["end_location"]
-            return {
-                startLL: {
-                    lat: start_location.lat(),
-                    lng: start_location.lng()
-                },
-                endLL: {
-                    lat: end_location.lat(),
-                    lng: end_location.lng()
-                }
-            }
-        }
-    </script>
-    <link rel="stylesheet" type="text/css" th:src="@{/css/style.css}"/>
-
 </head>
-<style>
-    #map {
-        width: 80%;
-        height: 80vh;
-        margin: 10vh auto 0px;
-    }
-</style>
-<body th:data-source="${source}" th:data-destination="${destination}">
-<script>
-    window.onload = function() {
-        initMap(document.body.getAttribute('data-source'), document.body.getAttribute('data-destination'))
-            .then(() => {
-                document.forms['myForm'].submit();
-            });
-    }
+<body th:data-source="${source}" th:data-destination="${destination}" th:data-apikey="${googleMapsApiKey}">
 
-</script>
-<div th:class="${destination == null or source == null} ? '' : 'hidden'">
-        <div id="map"></div>
+<div id="map" ></div>
+
+<div>
+    <button onclick="calculateRoute('DRIVING')">Driving</button>
+    <button onclick="calculateRoute('TRANSIT')">Public Transportation</button>
 </div>
-<a th:href="@{'/schedule?source='+ ${source} + '&destination=' + ${destination} + '&numberOfTravelers=' + ${numberOfTravelers} + '&motivation=' + ${motivation} + '&groupType=' + ${groupType} + '&startDate=' + ${startDate} + '&endDate=' + ${endDate} + '&budgetType=' + ${budgetType}}">Proceed</a>
+
+    <a th:href="@{'/schedule?source=' + ${#strings.defaultString(source, 'Unknown')}
+            + '&destination=' + ${#strings.defaultString(destination, 'Unknown')}
+            + '&numberOfTravelers=' + ${#strings.defaultString(numberOfTravelers, '1')}
+            + '&motivation=' + ${#strings.defaultString(motivation, 'leisure')}
+            + '&groupType=' + ${#strings.defaultString(groupType, 'solo')}
+            + '&startDate=' + ${#strings.defaultString(startDate, '2025-01-01')}
+            + '&endDate=' + ${#strings.defaultString(endDate, '2025-01-07')}
+            + '&budgetType=' + ${#strings.defaultString(budgetType, 'standard')}
+        }">Proceed</a>
+
+<!-- Google Maps API (Make sure the key is correct!) -->
+<script th:src="@{'https://maps.googleapis.com/maps/api/js?key=' + ${googleMapsApiKey} + '&callback=initMap&libraries=places,marker&loading=async'}" defer></script>
+
+<!-- External JS Scripts -->
+<script defer type="module" th:src="@{./script/initializeMap.js}"></script>
+<script defer type="module" th:src="@{./script/RouteDisplay.js}"></script>
 </body>
 </html>

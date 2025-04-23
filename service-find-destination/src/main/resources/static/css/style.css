@@ -2,10 +2,11 @@
  * Always set the map height explicitly to define the size of the div element
  * that contains the map.
  */
-#map{
-    width: 80%;
-    height: 400px;
-    margin: 20px auto;
+
+#map {
+    width: 70%;
+    height: 70%;
+    margin: 10vh auto 0;
 }
 
 /*
@@ -16,4 +17,19 @@ body {
     height: 100%;
     margin: 0;
     padding: 0;
+}
+.select-button {
+    background-color: #007bff;
+    align-self: center;
+    justify-content: center;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    display: block; /* Make the button a block element */
+    margin-top: 10px; /* Add some spacing between text and button */
+}
+.hidden {
+    display: none;
 }
